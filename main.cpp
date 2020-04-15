@@ -9,8 +9,6 @@
 
 #include "globals.h"
 
-#pragma message("Into main.cpp")
-
 //*******************************************
 // Define hardware objects
 //
