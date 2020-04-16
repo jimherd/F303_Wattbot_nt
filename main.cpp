@@ -1,10 +1,24 @@
 /* 
  * Wattbot-nt motion control board uP controller
  *
+ * The overall system consists of THREE subsystems
  * Provides an interface between the high-level control computer
  * and the FPGA system.
+ *  1.  HLcontrol   : High Level mission control (e.g. Raspberry Pi
+ *  2.  LLcontrol   : Low Level uP control of motion and sensing (STM32F303RE)
+ *  3.  FPGAcontrol : Low level control of time constrained interfaces
+ *
+ * The code in this project relates to the LLcontrol subsystem.
+ *
+ * Processor : STM32F303RE
+ * Framework : Mbed V5 (with RTOS)
+ * IDE       : Mbed Studio
+ * Compiler  : Arm V6
+ * SCC       : GIT/GITHUB
  *
  * Author : Jim Herd
+ *
+ * April 2020
  */
 
 #include "globals.h"
@@ -13,7 +27,9 @@
 // Define hardware objects
 //
 SerialDriver pc(USBTX, USBRX);     // tx, rx - buffered serial port
-FPGA_bus  bus(1,1,8);
+FPGA_bus  bus(1 /* PWM channel        */,
+              1 /* Quadrature channel */,
+              8 /* RC servo channels  */);
 
 DigitalOut  led1(LED1);
 DigitalOut  debug_pin(D15);
