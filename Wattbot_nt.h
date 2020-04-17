@@ -12,7 +12,10 @@
 //
 #define     COM_BAUD    921600
 
-//********************
+#define     MAX_DATA_BYTES_HLCONTROL_TO_LLCONTROL       16
+#define     MAX_DATA_BYTES_LLCONTROL_TO_HLCONTROL       16
+
+//*********************************************************
 // System data structures
 //
 // Queues for connection to external hardware
@@ -23,7 +26,7 @@ typedef struct {
     uint8_t     register_number;
     uint8_t     command;
     uint32_t    data;
-} uP_FPGA_queue_t;
+} LLcontrol_to_FPGAcontrol_queue_t;
 
 //
 // queue of responses being sent to HLcontrol
@@ -31,10 +34,21 @@ typedef struct {
 typedef struct {
     uint8_t     port; 
     uint8_t     nos_bytes; 
-    uint8_t     data[16];
-} uP_HLcontrol_queue_t;
+    uint8_t     data[MAX_DATA_BYTES_LLCONTROL_TO_HLCONTROL];
+} LLcontrol_to_HLcontrol_queue_t;
 
-//
+
+//*********************************************************
+// format of data packets from HLcontrol
+
+typedef struct {
+    uint8_t     command;
+    uint8_t     port;
+    uint8_t     nos_bytes;
+    uint8_t     data[MAX_DATA_BYTES_HLCONTROL_TO_LLCONTROL];
+}  HLcontrol_LLcontrol_packet_t;
+
+//*********************************************************
 // Set of commands that can be sent fro HLcontrol to uP
 
 typedef enum {
@@ -47,8 +61,10 @@ typedef enum {
     DYNAMIXEL_READ,
     uP_CONFIG,
     uP_STATUS
-} commands_t;
+} LLcontrol_commands_t;
  
+ //*********************************************************
+ // error codes
 
 typedef enum {
     CMD_SUCCESS                    =  0, 
