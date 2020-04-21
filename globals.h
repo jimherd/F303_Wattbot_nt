@@ -8,6 +8,9 @@
 #include    "Wattbot_nt.h"
 #include    "FPGA_bus.h"
 #include    "SerialDriver.h"
+#include    "ExCmdFromHLcontrol_task.h"
+
+#include    <cstdint>
 
 #ifndef     GLOBALS_H
 #define     GLOBALS_H
@@ -16,5 +19,6 @@
 #define     HANG        for(;;)
 
 extern DigitalOut  led1;
+extern SerialDriver HLcontrol;
 
 #endif

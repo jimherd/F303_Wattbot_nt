@@ -1,5 +1,5 @@
 /*
-* General constants and typedef structres for Wattbot-nt robot
+ * General constants and typedef structres for Wattbot-nt robot
  */
 
 #include    <cstdint>
@@ -67,8 +67,8 @@ typedef enum {
  // error codes
 
 typedef enum {
-    CMD_SUCCESS                    =  0, 
-    CMD_FAIL                       = -1,
+    OK                    =  0, 
+    CMD_FAIL              = -1,
 } error_codes_t;
 
 //********************

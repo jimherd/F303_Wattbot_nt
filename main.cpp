@@ -50,45 +50,7 @@ void read_from_HLcontrol_task ( void const *args );
 //
 //Mutex   sysdata_mutex;
 
-//*********************************************************
-// Task code
-//*********************************************************
-// read_from_HLcontrol_task : Read commands from High Level control
-// ========================
-//
-// Read commands from UART input channel that connects to High Level
-// control computer.
 
-#define     HLCONTROL_IN_PACKET_HEADER_SIZE     3
-#define     HLCONTROL_IN_PACKET_MAX_DATA_SIZE  16
-
-#define     HLCONTROL_IN_PACKET_COMMAND         0
-#define     HLCONTROL_IN_PACKET_PORT            1
-#define     HLCONTROL_IN_PACKET_DATA_BYTES      2  
-
-#define     HLCONTROL_IN_PACKET_DATA_SIZE_TOO_BIG       -1
-
-struct  {
-    uint8_t     header[HLCONTROL_IN_PACKET_HEADER_SIZE];
-    uint8_t     data[HLCONTROL_IN_PACKET_MAX_DATA_SIZE];
-} HLcontol_in_packet;
-
-void read_from_HLcontrol(void const *args)
-{
-uint32_t   read_from_HLcontrol_error; 
-
-    read_from_HLcontrol_error = 0;
-    FOREVER {
-    // read packet header from HLcontrol
-        HLcontrol.read(&HLcontol_in_packet.header[0], HLCONTROL_IN_PACKET_HEADER_SIZE);
-        if (HLcontol_in_packet.header[HLCONTROL_IN_PACKET_DATA_BYTES] > HLCONTROL_IN_PACKET_MAX_DATA_SIZE) {
-            read_from_HLcontrol_error = HLCONTROL_IN_PACKET_DATA_SIZE_TOO_BIG;
-        } else {
-    // read packet data from HLcontrol
-            HLcontrol.read(&HLcontol_in_packet.data[0], HLcontol_in_packet.header[HLCONTROL_IN_PACKET_DATA_BYTES]);
-        }
-    }
-}
 
 //*********************************************************
 // ** init   initialise hardware and system
