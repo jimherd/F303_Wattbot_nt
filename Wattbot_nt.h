@@ -39,14 +39,14 @@ typedef struct {
 
 
 //*********************************************************
-// format of data packets from HLcontrol
-
-typedef struct {
-    uint8_t     command;
-    uint8_t     port;
-    uint8_t     nos_bytes;
-    uint8_t     data[MAX_DATA_BYTES_HLCONTROL_TO_LLCONTROL];
-}  HLcontrol_LLcontrol_packet_t;
+// format of data packets from HLcontrol (no longer using binary format)
+//
+//typedef struct {
+//    uint8_t     command;
+//    uint8_t     port;
+//    uint8_t     nos_bytes;
+//    uint8_t     data[MAX_DATA_BYTES_HLCONTROL_TO_LLCONTROL];
+//}  HLcontrol_LLcontrol_packet_t;
 
 //*********************************************************
 // Set of commands that can be sent fro HLcontrol to uP
@@ -69,6 +69,7 @@ typedef enum {
 typedef enum {
     OK                    =  0, 
     CMD_FAIL              = -1,
+    CMD_STRING_TOO_BIG    = -2
 } error_codes_t;
 
 //********************

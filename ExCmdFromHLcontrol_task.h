@@ -1,29 +1,32 @@
 /*
  * General constants and typedef structres for Wattbot-nt robot
  */
- 
- //#include    <cstdint>
+
+ #include    <cstdint>
  
 
 #ifndef  ExCmdFromHLcontrol_task_H
 #define  ExCmdFromHLcontrol_task_H
 
-#include  "globals.h"
-
 //*********************************************************
 // Function templates
 
 uint32_t read_command_from_HLcontrol(void);
+uint32_t parse_command (void);
+uint32_t execute_command(void);
 
-#define     HLCONTROL_IN_PACKET_COMMAND         0
-#define     HLCONTROL_IN_PACKET_PORT            1
-#define     HLCONTROL_IN_PACKET_DATA_BYTES      2  
+//*********************************************************
+// Constants relevant to this task
 
-#define     HLCONTROL_IN_PACKET_DATA_SIZE_TOO_BIG       -1
+enum {MODE_U, MODE_I, MODE_R, MODE_S} modes;  // defines modes as scan progresses
 
-#define     MAX_COMMAND_LENGTH      100
-#define     MAX_COMMAND_STRINGS      16
-#define     CMD_STRING_TOO_BIG       -6
+#define   LETTER_ERROR     -12;  
+#define   DOT_ERROR      -13;
+#define   PLUSMINUS_ERROR   -14
+
+
+#define     MAX_COMMAND_LENGTH         100
+#define     MAX_COMMAND_PARAMETERS      16
 
 #endif
 
