@@ -1,12 +1,11 @@
 /*
- * General constants and typedef structres for Wattbot-nt robot
+ * General constants for read_from_HLcontrol_task.cpp
  */
 
  #include    <cstdint>
  
-
-#ifndef  ExCmdFromHLcontrol_task_H
-#define  ExCmdFromHLcontrol_task_H
+#ifndef  read_from_HLcontrol_task_H
+#define  read_from_HLcontrol_task_H
 
 //***************************************************************************
 // Function templates
