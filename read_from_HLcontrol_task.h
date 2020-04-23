@@ -25,6 +25,7 @@ enum {MODE_U, MODE_I, MODE_R, MODE_S} modes;  // defines modes as scan progresse
 #define   DOT_ERROR      -13;
 #define   PLUSMINUS_ERROR   -14
 #define   BAD_COMMAND       -15
+#define   BAD_PORT_NUMBER   -16
 
 
 #define     MAX_COMMAND_LENGTH         100

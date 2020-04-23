@@ -130,7 +130,7 @@ uint8_t     character_type;
 //
 uint32_t convert_tokens(void) 
 {
-    if (char_type[command[0]] != LETTER) {
+    if ((arg_type[0] != MODE_S) || (char_type[command[0]] != LETTER)) {
         return BAD_COMMAND;
     }
     for (uint32_t i=0 ; i < argc ; i++) {
@@ -142,6 +142,9 @@ uint32_t convert_tokens(void)
                 float_parameters[i] = atof(&command[arg_pt[i]]);
                 break;
         }
+    }
+    if ((arg_type[1] != MODE_I) || (int_parameters[1] > 63)) {
+        return BAD_PORT_NUMBER;
     }
     return SUCCESS;
 }

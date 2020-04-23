@@ -43,7 +43,8 @@ void         init(void);
 //***************************************************************************
 // task templates.
 //
-void read_from_HLcontrol_task ( void const *args );
+void read_from_HLcontrol_task (void const *args);
+void write_to_HLcontrol_task  (void const *args);
 
 //***************************************************************************
 // Mutex semaphores
