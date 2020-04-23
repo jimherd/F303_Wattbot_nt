@@ -21,6 +21,7 @@
 
 #include    "Wattbot_nt.h"
 #include    "read_from_HLcontrol_task.h"
+#include    "write_to_HLcontrol_task.h"
 #include    "ROM_data.h"
 
 //***************************************************************************

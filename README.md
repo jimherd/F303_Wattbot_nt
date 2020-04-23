@@ -10,14 +10,15 @@ The control of the Wattbot-nt robot vehicle consists of three subsystems
 
 This repository contains the code for the LLcontrol subsystem.
 
-## LLcontrol subsystem characteristics
+## LLcontrol subsystem hardware
 
 - Based on STM32F303RE microprocessor (72MHz Arm M4)
+- 512KB FLASH, 80KB SRAM
 - Programmed with the MbedOS/RTOS system (Mbed Studio)
 - UART connection to the HLcontrol subsystems
 - High speed byte bus to FPGAcontrol subsystems
 
-## Tasks
+## LLcontrol subsystem tasks
 
 - Communicate with HLcontrol computer through serial port
 - Communicate with FPGA through a fast bidirectional 8-bit bus

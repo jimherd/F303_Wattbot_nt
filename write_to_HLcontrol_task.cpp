@@ -13,7 +13,7 @@
 
 //***************************************************************************
 
-void write_to_HLcontrol_task  (void const *args)
+void write_to_HLcontrol_task  (void)
 {
     FOREVER {
     }

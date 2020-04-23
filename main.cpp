@@ -43,57 +43,69 @@ void         init(void);
 //***************************************************************************
 // task templates.
 //
-void read_from_HLcontrol_task (void const *args);
-void write_to_HLcontrol_task  (void const *args);
+void read_from_HLcontrol_task (void);
+void write_to_HLcontrol_task  (void);
+
+Thread read_from_HLcontrol(osPriorityNormal, OS_STACK_SIZE, NULL, NULL);
+Thread write_to_HLcontrol(osPriorityNormal, OS_STACK_SIZE, NULL, NULL);
 
 //***************************************************************************
 // Mutex semaphores
 //
 //Mutex   sysdata_mutex;
 
+//***************************************************************************
+// Queues
 
+Queue<char*, 16> HLcontrol_queue;  // holds replies being sent to HLcontrol
 
 //***************************************************************************
 // ** init   initialise hardware and system
 //
 void init(void)
 {
+//
+// initialise hardware
+//
     HLcontrol.baud(COM_BAUD);
     bus.initialise();
-}   
-    
-void print_char(char c = '*')
-{
-    debug_pin = !debug_pin;
-//    pc.printf("%c", c);       // 50uS
-    HLcontrol.putc('*');             // 16uS
-    debug_pin = !debug_pin;
-    fflush(stdout);
+//
+// start system tasks
+//
+    read_from_HLcontrol.start(callback(read_from_HLcontrol_task));
+    write_to_HLcontrol.start(callback(write_to_HLcontrol_task));
 }
 
-Thread thread;
+//***************************************************************************
+// ** main   
+//
+int main() {
+  init();
+  HLcontrol.printf("\n\n*** RTOS basic example ***\n");
 
-
-void print_thread() {
-uint64_t now;
-
-    while (true) {
-        now = Kernel::get_ms_count();   // 2.29uS
-        ThisThread::sleep_until(now + 3);
-        print_char(); 
-    }
+  while (true) {
+    led1 = !led1;
+    ThisThread::sleep_for(3000); // 1 seconds
+  }
 }
 
-int main()
-{
-    init();
-    HLcontrol.printf("\n\n*** RTOS basic example ***\n");
+//void print_char(char c = '*') {
+//  debug_pin = !debug_pin;
+//  //    pc.printf("%c", c);       // 50uS
+//  HLcontrol.putc('*'); // 16uS
+//  debug_pin = !debug_pin;
+//  fflush(stdout);
+//}
 
-    thread.start(print_thread);
+//Thread thread;
 
-    while (true) {
-        led1 = !led1;
-        ThisThread::sleep_for(3000);   // 1 seconds
-    }
-}
+//void print_thread() {
+//uint64_t now;
+//
+//    while (true) {
+//        now = Kernel::get_ms_count();   // 2.29uS
+//        ThisThread::sleep_until(now + 3);
+//        print_char(); 
+//    }
+//}
 

@@ -18,9 +18,9 @@ int         int_parameters[MAX_COMMAND_PARAMETERS];
 float       float_parameters[MAX_COMMAND_PARAMETERS];
 
 //***************************************************************************
-// read_command_from_HLcontrol : Read ascii command string from HLcontrol
+// read_command_from_HLcontrol : Read ASCII command string from HLcontrol
 //
-// 
+
 uint32_t read_command_from_HLcontrol(void) 
 {
 uint8_t character;
@@ -170,14 +170,11 @@ uint32_t execute_command()
     return 0;
 }
 
-
-
-
 //***************************************************************************
 // Task code
 //***************************************************************************
 //
-void read_from_HLcontrol(void const *args)
+void read_from_HLcontrol_task(void)
 {
 uint32_t   status; 
 

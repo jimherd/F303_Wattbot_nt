@@ -22,7 +22,7 @@
 // END       = '\n'
 // OTHER     = all other characters in the 256 extended ASCII set
 //
-// This is uded in the command string parser in "ExCmdFromHLcontrol_task"
+// This is uded in the command string parser in "read_from_HLcontrol_task"  ReadFromHLcontrolTask
 
 enum {LETTER, NUMBER, DOT, PLUSMINUS, NULTERM, END, OTHER};
 
