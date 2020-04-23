@@ -1,6 +1,6 @@
-//*********************************************************
+//***************************************************************************
 // Task code
-//*********************************************************
+//***************************************************************************
 // read_from_HLcontrol_task : Read/execute commands from High Level control
 // ========================
 //
@@ -9,13 +9,15 @@
 
 #include  "globals.h"
 
-//*********************************************************
+//***************************************************************************
 // Globals for this task
 
-uint8_t     command[MAX_COMMAND_LENGTH], character_count;
+char        command[MAX_COMMAND_LENGTH], character_count;
 uint32_t    argc, arg_pt[MAX_COMMAND_PARAMETERS], arg_type[MAX_COMMAND_PARAMETERS];
+int         int_parameters[MAX_COMMAND_PARAMETERS];
+float       float_parameters[MAX_COMMAND_PARAMETERS];
 
-//*********************************************************
+//***************************************************************************
 // read_command_from_HLcontrol : Read ascii command string from HLcontrol
 //
 // 
@@ -42,11 +44,14 @@ uint8_t character;
     return SUCCESS;
 }
 
-//*********************************************************
-// parse_command : analyse command string and convert ant ints/reals
+//***************************************************************************
+// parse_command : analyse command string and convert into labelled strings
+//
+// Breaks the command string into a set of token strings that are 
+// labelled REAL, INTEGER or STRING.  
 //
 // Code uses a STATE MACHINE to walkthrough the command string.  Refer
-// to associated documentation.
+// to associated documentation.  
 
 // defines modes as scan progresses : U=undefined, I=integer, R=real, S=string
 //
@@ -113,31 +118,71 @@ uint8_t     character_type;
                 }
                 break;
         }
+        if (status != SUCCESS) {
+            return status;
+        }
     }
-    return status;
+    return SUCCESS;
 }
 
-//*********************************************************
+//***************************************************************************
+// convert_tokens : convert relevant tokens to numerical values
+//
+uint32_t convert_tokens(void) 
+{
+    if (char_type[command[0]] != LETTER) {
+        return BAD_COMMAND;
+    }
+    for (uint32_t i=0 ; i < argc ; i++) {
+        switch (arg_type[i]) {
+            case MODE_I :
+                int_parameters[i] = atoi(&command[arg_pt[i]]);
+                break;
+            case MODE_R :
+                float_parameters[i] = atof(&command[arg_pt[i]]);
+                break;
+        }
+    }
+    return SUCCESS;
+}
+
+//***************************************************************************
+// reply_to_HLcontrol : send reply
+//
+void reply_to_HLcontrol(uint32_t status)
+{
+    return;
+}
+
+//***************************************************************************
+// execute_command : run processed command
+//
 uint32_t execute_command()
 {
+    switch (command[0]) {
+        case 'p' :          // PING
+            reply_to_HLcontrol(SUCCESS);
+            break;
+    }
     return 0;
 }
 
-//*********************************************************
+
+
+
+//***************************************************************************
 // Task code
-//*********************************************************
+//***************************************************************************
 //
 void read_from_HLcontrol(void const *args)
 {
-uint32_t   read_from_HLcontrol_error; 
+uint32_t   status; 
 
-    read_from_HLcontrol_error = 0;
+    status = 0;
     FOREVER {
-    // read command string from HLcontrol and deli
-        read_from_HLcontrol_error = read_command_from_HLcontrol();
-    // parse command (split into strings)
-        read_from_HLcontrol_error = parse_command();
-    // implement command
-        read_from_HLcontrol_error = execute_command(); 
+        status = read_command_from_HLcontrol();
+        status = parse_command();
+        status = convert_tokens();
+        status = execute_command(); 
     }
 }

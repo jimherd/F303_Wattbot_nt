@@ -7,10 +7,11 @@
 #ifndef     GLOBALS_H
 #define     GLOBALS_H
 
-//*********************************************************
+//***************************************************************************
 // Necessary include files
 
 #include    <cstdint>
+#include    <cstdlib>
 
 #include    "mbed.h"
 #include    "rtos.h"
@@ -22,13 +23,13 @@
 #include    "ExCmdFromHLcontrol_task.h"
 #include    "ROM_data.h"
 
-//*********************************************************
+//***************************************************************************
 // Macros
 
 #define     FOREVER     for(;;)
 #define     HANG        for(;;)
 
-//*********************************************************
+//***************************************************************************
 // Extern references to hardware interfaces
 
 extern FPGA_bus  bus;

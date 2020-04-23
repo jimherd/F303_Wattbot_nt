@@ -7,8 +7,9 @@
 #ifndef  ROM_data_H
 #define  ROM_data_H
 
-//*********************************************************
-// ROM table to allow fast categorisation of charcaters in a command from HLcontrol
+//***************************************************************************
+// ROM table to allow fast categorisation of charcaters in a command from 
+// HLcontrol
 //
 // Using simple ASCII chacter set for commands this lookup table categorises 
 // a charcater as one of the following types
