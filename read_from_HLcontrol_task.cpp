@@ -135,11 +135,12 @@ uint32_t convert_tokens(void)
     }
     for (uint32_t i=0 ; i < argc ; i++) {
         switch (arg_type[i]) {
-            case MODE_I :
-                int_parameters[i] = atoi(&command[arg_pt[i]]);
+            case MODE_I :  // save as integer and float
+                int_parameters[i] = ASCII_to_int(&command[arg_pt[i]]);
+                float_parameters[i] = (float)int_parameters[i];
                 break;
             case MODE_R :
-                float_parameters[i] = atof(&command[arg_pt[i]]);
+                float_parameters[i] = ASCII_to_float(&command[arg_pt[i]]);
                 break;
         }
     }
@@ -171,6 +172,58 @@ uint32_t execute_command()
     }
     return 0;
 }
+
+//***************************************************************************
+// ASCII_to_int : local version of atoi()
+//
+// String has already been checked therefore no need to test for errors
+
+int32_t ASCII_to_int(char *str) {
+
+int32_t result = 0;    // Initialize result
+int32_t sign = 1;      // Initialize sign as positive
+uint32_t char_pt = 0;  // Initialize index of first digit
+
+    if (*str == '\0') {
+        return 0;
+    }
+    if (str[0] == '-') {
+        sign = -1;
+        char_pt++; // Also update index of first digit
+    }
+     for (; str[char_pt] != '\0'; ++char_pt) {
+        result = (result * 10) + (str[char_pt] - '0');
+    }
+    return sign * result;
+}
+
+//***************************************************************************
+// ASCII_to_float : local version of atof() 
+//
+// String has already been checked therefore no need to test for errors
+// Saves 5K bytes of FLASH and therefore should be faster.
+
+float ASCII_to_float(const char *char_pt) {
+  float result = 0, fact = 1;
+    if (*char_pt == '-') {
+        char_pt++;
+        fact = -1;
+    };
+    for (uint32_t point_seen = 0; *char_pt == '\0'; char_pt++) {
+        if (*char_pt == '.') {
+            point_seen = 1;
+            continue;
+        };
+        uint32_t d = *char_pt - '0';
+        if (d >= 0 && d <= 9) {
+            if (point_seen) {
+                fact = fact / 10.0f;
+            }
+        result = (result * 10.0f) + (float)d;
+        };
+    };
+    return result * fact;
+};
 
 //***************************************************************************
 // Task code
