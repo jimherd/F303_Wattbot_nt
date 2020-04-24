@@ -164,7 +164,9 @@ uint32_t execute_command()
 {
     switch (command[0]) {
         case 'p' :          // PING
-            reply_to_HLcontrol(SUCCESS);
+            reply_t *mail = HLcontrol_reply_queue.alloc();
+            sprintf(mail->reply, "%d 0", int_parameters[1]);
+            HLcontrol_reply_queue.put(mail);
             break;
     }
     return 0;

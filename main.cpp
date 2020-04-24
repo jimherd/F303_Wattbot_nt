@@ -55,9 +55,9 @@ Thread write_to_HLcontrol(osPriorityNormal, OS_STACK_SIZE, NULL, NULL);
 //Mutex   sysdata_mutex;
 
 //***************************************************************************
-// Queues
-
-Queue<char*, 16> HLcontrol_queue;  // holds replies being sent to HLcontrol
+// Mail queues
+ 
+Mail<reply_t, 8> HLcontrol_reply_queue;  // holds replies being sent to HLcontrol
 
 //***************************************************************************
 // ** init   initialise hardware and system

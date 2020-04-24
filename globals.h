@@ -37,4 +37,6 @@ extern FPGA_bus  bus;
 extern DigitalOut  led1;
 extern SerialDriver HLcontrol;
 
+extern  Mail<reply_t,8> HLcontrol_reply_queue;  // holds replies being sent to HLcontrol
+
 #endif

@@ -3,6 +3,8 @@
  */
 
 #include    <cstdint>
+#include    "mbed.h"
+#include    "rtos.h"
 
 #ifndef  WATTBOT_NT_H
 #define  WATTBOT_NT_H
@@ -14,6 +16,8 @@
 
 #define     MAX_DATA_BYTES_HLCONTROL_TO_LLCONTROL       16
 #define     MAX_DATA_BYTES_LLCONTROL_TO_HLCONTROL       16
+
+
 
 //*********************************************************
 // System data structures
@@ -77,5 +81,11 @@ typedef enum {
 //
 #define SET_PROBE_1     probe_1_pin=1
 #define CLR_PROBE_1     probe_1_pin=0
+
+typedef struct {
+    char    reply[80];
+} reply_t;
+
+//extern Mail<reply_t, 8> HLcontrol_reply_queue;  // holds replies being sent to HLcontrol
 
 #endif

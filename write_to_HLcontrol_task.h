@@ -10,4 +10,6 @@
 //***************************************************************************
 // Function templates
 
+uint32_t read_command_from_HLcontrol(void);
+
 #endif
