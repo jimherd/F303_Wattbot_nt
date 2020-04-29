@@ -27,7 +27,8 @@
 //***************************************************************************
 // Define hardware objects
 //
-SerialDriver HLcontrol(USBTX, USBRX);     // tx, rx - buffered serial port
+Serial Sys_Debug(USBTX, USBRX);     // tx, rx - buffered serial port
+SerialDriver HLcontrol(PB_6, PB_7);
 FPGA_bus  bus(1 /* PWM channel        */,
               1 /* Quadrature channel */,
               8 /* RC servo channels  */);
@@ -68,6 +69,7 @@ void init(void)
 // initialise hardware
 //
     HLcontrol.baud(COM_BAUD);
+    Sys_Debug.baud(COM_BAUD);
     bus.initialise();
 //
 // start system tasks
@@ -82,6 +84,7 @@ void init(void)
 int main() {
   init();
   HLcontrol.printf("\n\n*** RTOS basic example ***\n");
+  Sys_Debug.printf("System started\n");
 
   while (true) {
     led1 = !led1;

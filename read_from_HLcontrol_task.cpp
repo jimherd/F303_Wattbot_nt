@@ -12,7 +12,8 @@
 //***************************************************************************
 // Globals for this task
 
-char        command[MAX_COMMAND_LENGTH], character_count;
+char        command[MAX_COMMAND_LENGTH];
+uint32_t    character_count;
 uint32_t    argc, arg_pt[MAX_COMMAND_PARAMETERS], arg_type[MAX_COMMAND_PARAMETERS];
 int         int_parameters[MAX_COMMAND_PARAMETERS];
 float       float_parameters[MAX_COMMAND_PARAMETERS];
@@ -23,25 +24,31 @@ float       float_parameters[MAX_COMMAND_PARAMETERS];
 
 uint32_t read_command_from_HLcontrol(void) 
 {
-uint8_t character;
+uint8_t     character;
+uint32_t    count, status;
 
-    for(character_count=0 ; character_count < MAX_COMMAND_LENGTH ; character_count++) {
+    for(count=0 ; count < MAX_COMMAND_LENGTH ; count++) {
         character = HLcontrol.getc();
         if (character == '\n') {
+            command[count++] = '\0';
+            command[count]   = '\n';
             break;
         } else {
             if ((character == '\r') || (character == ' ')) {
-                command[character_count] = '\0';
+                command[count] = '\0';
             }else {
-                command[character_count] = character;
+                command[count] = character;
             }
         }
     }
-    if (character_count == (MAX_COMMAND_LENGTH-1)) {
-        command[character_count++] = '\0';
-        return CMD_STRING_TOO_BIG;
+    if (count == (MAX_COMMAND_LENGTH-1)) {
+        command[count++] = '\n';
+        status = CMD_STRING_TOO_BIG;
+    } else {
+        status = SUCCESS;
     }
-    return SUCCESS;
+    character_count = count;
+    return status;
 }
 
 //***************************************************************************
@@ -64,7 +71,7 @@ uint8_t     character_type;
     argc = 0;
     mode = MODE_U;
     status = SUCCESS;
-    for (count=0 ; count < character_count ; count++) {
+    for (count=0 ; count <= character_count ; count++) {
         character_type = char_type[command[count]];
         switch (character_type) {
             case LETTER :
@@ -74,7 +81,7 @@ uint8_t     character_type;
                     if (mode == MODE_U) {
                         mode = MODE_S;
                         arg_pt[argc] = count;
-                        argc++;
+                        // argc++;
                     } 
                 }
                 break;
@@ -82,7 +89,7 @@ uint8_t     character_type;
                 if (mode == MODE_U) {
                     mode = MODE_I;
                     arg_pt[argc] = count;
-                    argc++;
+                    // argc++;
                 } 
                 break;
             case DOT :
@@ -98,7 +105,7 @@ uint8_t     character_type;
                 if (mode == MODE_U) {
                     mode = MODE_I;
                     arg_pt[argc] = count;
-                    argc++;
+                    //argc++;
                 } else {
                     if ((mode == MODE_I) || (mode == MODE_R)) {
                         status = PLUSMINUS_ERROR;
@@ -107,22 +114,19 @@ uint8_t     character_type;
                 break;
             case NULTERM :
                 if (mode != MODE_U) {
-                    arg_type[argc] = mode;
+                    arg_type[argc++] = mode;
                     mode = MODE_U;
                 }
                 break;
             case END :
                 if (mode != MODE_U) {
-                    arg_type[argc] = mode;
+                    arg_type[argc++] = mode;
                     mode = MODE_U;
                 }
                 break;
-        }
-        if (status != SUCCESS) {
-            return status;
-        }
-    }
-    return SUCCESS;
+        }   // end of SWITCH
+    }  // end of FOR
+    return status;
 }
 
 //***************************************************************************
@@ -133,7 +137,7 @@ uint32_t convert_tokens(void)
     if ((arg_type[0] != MODE_S) || (char_type[command[0]] != LETTER)) {
         return BAD_COMMAND;
     }
-    for (uint32_t i=0 ; i < argc ; i++) {
+    for (uint32_t i=0 ; i <= argc ; i++) {
         switch (arg_type[i]) {
             case MODE_I :  // save as integer and float
                 int_parameters[i] = ASCII_to_int(&command[arg_pt[i]]);
@@ -166,7 +170,7 @@ uint32_t execute_command()
     switch (command[0]) {
         case 'p' :          // PING
             reply_t *mail = HLcontrol_reply_queue.alloc();
-            sprintf(mail->reply, "%d 0", int_parameters[1]);
+            sprintf(mail->reply, "%d 0\n", int_parameters[1]);
             HLcontrol_reply_queue.put(mail);
             break;
     }
@@ -198,7 +202,7 @@ uint32_t char_pt = 0;  // Initialize index of first digit
 }
 
 //***************************************************************************
-// ASCII_to_float : local version of atof() 
+// ASCII_to_float : local version of atof()   *** TO BE CHECKED  ***
 //
 // String has already been checked therefore no need to test for errors
 // Saves 5K bytes of FLASH and therefore should be faster.
@@ -213,14 +217,14 @@ float ASCII_to_float(const char *char_pt) {
         if (*char_pt == '.') {
             point_seen = 1;
             continue;
-        };
+        }
         uint32_t d = *char_pt - '0';
-        if (d >= 0 && d <= 9) {
+//        if (d >= 0 && d <= 9) {
             if (point_seen) {
                 fact = fact / 10.0f;
             }
         result = (result * 10.0f) + (float)d;
-        };
+//        };
     };
     return result * fact;
 };

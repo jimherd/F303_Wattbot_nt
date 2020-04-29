@@ -12,10 +12,10 @@
 //********************
 // COM port data
 //
-#define     COM_BAUD    921600
+#define     COM_BAUD    115200
 
-#define     MAX_DATA_BYTES_HLCONTROL_TO_LLCONTROL       16
-#define     MAX_DATA_BYTES_LLCONTROL_TO_HLCONTROL       16
+//#define     MAX_DATA_BYTES_HLCONTROL_TO_LLCONTROL       16
+//#define     MAX_DATA_BYTES_LLCONTROL_TO_HLCONTROL       16
 
 
 
@@ -35,11 +35,11 @@ typedef struct {
 //
 // queue of responses being sent to HLcontrol
 
-typedef struct {
-    uint8_t     port; 
-    uint8_t     nos_bytes; 
-    uint8_t     data[MAX_DATA_BYTES_LLCONTROL_TO_HLCONTROL];
-} LLcontrol_to_HLcontrol_queue_t;
+// struct {
+//    uint8_t     port; 
+//    uint8_t     nos_bytes; 
+//    uint8_t     data[MAX_DATA_BYTES_LLCONTROL_TO_HLCONTROL];
+//} LLcontrol_to_HLcontrol_queue_t;
 
 
 //*********************************************************
