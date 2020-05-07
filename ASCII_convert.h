@@ -1,15 +1,17 @@
 //***************************************************************************
-// General constants for write_to_HLcontrol_task.cpp
+// ASCII_convert.h : ASCII conversion routines
 //***************************************************************************
 
  #include    <cstdint>
  
-#ifndef  write_to_HLcontrol_task_H
-#define  write_to_HLcontrol_task_H
+#ifndef  ASCII_CONVERT_H
+#define  ASCII_CONVERT_H
 
 //***************************************************************************
 // Function templates
 
-//uint32_t read_command_from_HLcontrol(void);
+int32_t ASCII_to_int(char *str);
+float ASCII_to_float(const char *char_pt);
+char* int_to_ASCII(int32_t num, char* str);
 
 #endif

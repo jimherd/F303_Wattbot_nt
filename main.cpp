@@ -46,9 +46,11 @@ void         init(void);
 //
 void read_from_HLcontrol_task (void);
 void write_to_HLcontrol_task  (void);
+void FPGA_IO_task(void);
 
 Thread read_from_HLcontrol(osPriorityNormal, OS_STACK_SIZE, NULL, NULL);
 Thread write_to_HLcontrol(osPriorityNormal, OS_STACK_SIZE, NULL, NULL);
+Thread FPGA_IO(osPriorityNormal, OS_STACK_SIZE, NULL, NULL);
 
 //***************************************************************************
 // Mutex semaphores
@@ -59,6 +61,7 @@ Thread write_to_HLcontrol(osPriorityNormal, OS_STACK_SIZE, NULL, NULL);
 // Mail queues
  
 Mail<reply_t, 8> HLcontrol_reply_queue;  // holds replies being sent to HLcontrol
+Mail<LLcontrol_to_FPGAcontrol_queue_t,8> FPGA_cmd_queue;
 
 //***************************************************************************
 // ** init   initialise hardware and system
@@ -76,6 +79,7 @@ void init(void)
 //
     read_from_HLcontrol.start(callback(read_from_HLcontrol_task));
     write_to_HLcontrol.start(callback(write_to_HLcontrol_task));
+    FPGA_IO.start(callback(FPGA_IO_task));
 }
 
 //***************************************************************************

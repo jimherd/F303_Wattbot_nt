@@ -14,7 +14,7 @@
  *      You can only change the defaults by recompiling the SystemVerilog code
  *      on the FPGA.
  */ 
- 
+
 FPGA_bus::FPGA_bus(int nos_PWM   /* = NOS_PWM_CHANNELS */, 
                    int nos_QE    /* = NOS_QE_CHANNELS  */, 
                    int nos_servo /* = NOS_RC_CHANNELS  */ )
@@ -25,14 +25,57 @@ FPGA_bus::FPGA_bus(int nos_PWM   /* = NOS_PWM_CHANNELS */,
                     async_uP_reset(ASYNC_UP_RESET_PIN),
                     uP_ack(ASYNC_UP_ACK_PIN),
                     uP_handshake_2(ASYNC_UP_HANDSHAKE_2_PIN),
+                    log_pin(LOG_PIN),
                     
                       _nos_PWM_units(nos_PWM),
                       _nos_QE_units(nos_QE),
-                      _nos_servo_units(nos_servo)               
-{  
+                      _nos_servo_units(nos_servo)             
+{
+ /*    _nos_PWM_units   = nos_PWM;
+    _nos_QE_units    = nos_QE;
+    _nos_servo_units = nos_servo;  */
+    
     async_uP_start   = LOW;
 }
 
+/* 
+
+FPGA_bus::FPGA_bus(int nos_PWM   = NOS_PWM_CHANNELS, 
+                   int nos_QE    = NOS_QE_CHANNELS, 
+                   int nos_servo = NOS_RC_CHANNELS)
+                   
+                :   async_uP_start(ASYNC_UP_START_PIN), 
+                    async_uP_handshake_1(ASYNC_UP_HANDSHAKE_1_PIN),
+                    async_uP_RW(ASYNC_UP_RW_PIN),
+                    async_uP_reset(ASYNC_UP_RESET_PIN),
+                    uP_ack(ASYNC_UP_ACK_PIN),
+                    uP_handshake_2(ASYNC_UP_HANDSHAKE_2_PIN), 
+                    log_pin(LOG_PIN)                 
+{
+    _nos_PWM_units   = nos_PWM;
+    _nos_QE_units    = nos_QE;
+    _nos_servo_units = nos_servo;
+    
+    async_uP_start   = LOW;
+}
+
+FPGA_bus::FPGA_bus(void)
+                :   async_uP_start(ASYNC_UP_START_PIN), 
+                    async_uP_handshake_1(ASYNC_UP_HANDSHAKE_1_PIN),
+                    async_uP_RW(ASYNC_UP_RW_PIN),
+                    async_uP_reset(ASYNC_UP_RESET_PIN),
+                    uP_ack(ASYNC_UP_ACK_PIN),
+                    uP_handshake_2(ASYNC_UP_HANDSHAKE_2_PIN),
+                    log_pin(LOG_PIN)                  
+{
+    _nos_PWM_units   = NOS_PWM_CHANNELS;
+    _nos_QE_units    = NOS_QE_CHANNELS;
+    _nos_servo_units = NOS_RC_CHANNELS;
+    
+    async_uP_start       = LOW;
+}
+
+*/
 
 void  FPGA_bus::initialise(void)
 {
@@ -52,6 +95,7 @@ void  FPGA_bus::initialise(void)
     wait_us(20);
     
     global_FPGA_unit_error_flag = NO_ERROR;
+    log_pin = LOW;
 }
     
 void FPGA_bus::do_start(void)
@@ -120,17 +164,14 @@ void FPGA_bus::do_transaction(uint32_t command,
                     uint32_t *data,
                     uint32_t *status)
 {
+    log_pin = HIGH;
     do_start();
- //   pc.printf("\n1");
     do_write(command, register_address, register_data);
- //   pc.printf(" 2");
     do_read(&in_pkt);
- //   pc.printf(" 3");
     do_end();
- //   pc.printf(" 4\n");
+    log_pin = LOW;
     *data = in_pkt.word_data[0];
     *status = in_pkt.word_data[1];
-   // pc.printf("data = %#08X  :: status = %#08X\n", in_pkt.word_data[0], in_pkt.word_data[1]);
 }
 
 uint32_t  FPGA_bus::do_command(FPGA_packet_t cmd_packet)
@@ -209,17 +250,36 @@ void FPGA_bus::disable_RC_channel(uint32_t channel)
     global_FPGA_unit_error_flag = status;
 }
 
-void FPGA_bus::enable_speed_measure(uint32_t channel)
+void FPGA_bus::QE_config(uint32_t channel, uint32_t config_value)
 {
-    uint32_t register_address = ((QE_BASE + (channel * NOS_QE_REGISTERS)) + QE_CONFIG);
-    uint32_t register_data = QE_SPEED_CALC_ENABLE;
-    do_transaction(WRITE_REGISTER_CMD, register_address, register_data, &data, &status);
+    uint32_t register_address = ((PWM_BASE + (channel * NOS_PWM_REGISTERS)) + PWM_CONFIG);
+    do_transaction(WRITE_REGISTER_CMD, register_address , config_value, &data, &status);
+    global_FPGA_unit_error_flag = status;;
+}
+
+void FPGA_bus::enable_speed_measure(uint32_t channel, uint32_t config_value, uint32_t phase_time)
+{
+    uint32_t register_base = (QE_BASE + (channel * NOS_QE_REGISTERS));
+    do_transaction(WRITE_REGISTER_CMD, (register_base + QE_SIM_PHASE_TIME), phase_time, &data, &status);
+    global_FPGA_unit_error_flag = status;
+    if (status != NO_ERROR) {
+        return;
+    }
+    do_transaction(WRITE_REGISTER_CMD, (register_base + QE_CONFIG), config_value, &data, &status);
     global_FPGA_unit_error_flag = status;
 }
 
 uint32_t FPGA_bus::read_speed_measure(uint32_t channel)
 {
-    uint32_t register_address = ((QE_BASE + (channel * NOS_QE_REGISTERS)) + QE_CONFIG);
+    uint32_t register_address = ((QE_BASE + (channel * NOS_QE_REGISTERS)) + QE_SPEED_BUFFER);
+    do_transaction(READ_REGISTER_CMD, register_address, NULL, &data, &status);
+    global_FPGA_unit_error_flag = status;
+    return data;
+}
+
+uint32_t FPGA_bus::read_count_measure(uint32_t channel)
+{
+    uint32_t register_address = ((QE_BASE + (channel * NOS_QE_REGISTERS)) + QE_COUNT_BUFFER);
     do_transaction(READ_REGISTER_CMD, register_address, NULL, &data, &status);
     global_FPGA_unit_error_flag = status;
     return data;

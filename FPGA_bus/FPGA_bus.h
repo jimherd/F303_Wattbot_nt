@@ -20,6 +20,8 @@
 #define ASYNC_UP_ACK_PIN          PB_4
 #define ASYNC_UP_RESET_PIN        PB_5
 
+#define LOG_PIN                   PB_8
+
 //
 // 
 #define PWM_BASE            1
@@ -29,9 +31,6 @@
 #define QE_BASE             ((NOS_PWM_REGISTERS * NOS_PWM_CHANNELS) + PWM_BASE)
 #define NOS_QE_REGISTERS    7
 #define NOS_QE_CHANNELS     4
-
-#define QE_SPEED_CALC_ENABLE    0x00010000
-#define QE_SPEED_CALC_DISABLE   0x00000000
 
 #define RC_BASE             ((NOS_QE_REGISTERS * NOS_QE_CHANNELS) + QE_BASE)
 #define NOS_RC_CHANNELS     8
@@ -43,7 +42,24 @@
 
 #define RC_0                RC_BASE
 
-#define NOS_RECEIVED_PACKET_WORDS  2
+//
+// System can be configured to return ONE or TWO 32-bit values from the FPGA.
+//
+//      first value  : 32-bit data value
+//      second value : 32-bit status value
+//
+// In practice, the status word carries little or no information but consumes
+// four 8-bit transactions between the FPGA and the uP.
+//
+// Uncomment following #define to enable status word to be returned.
+
+//#define INCLUDE_32_BIT_STATUS_RETURN
+
+#ifdef INCLUDE_32_BIT_STATUS_RETURN
+    #define NOS_RECEIVED_PACKET_WORDS  2
+#else
+    #define NOS_RECEIVED_PACKET_WORDS  1
+#endif
 
 #define SET_BUS_INPUT             (GPIOC->MODER = (GPIOC->MODER & 0xFFFF0000))
 #define SET_BUS_OUTPUT            (GPIOC->MODER = ((GPIOC->MODER & 0xFFFF0000) | 0x00005555))
@@ -73,8 +89,8 @@ typedef struct {
 } FPGA_packet_t;
 
 typedef union {
-    uint32_t word_data[NOS_RECEIVED_PACKET_WORDS];
-    uint8_t  byte_data[NOS_RECEIVED_PACKET_WORDS << 2];
+    uint32_t word_data[2];    // NOS_RECEIVED_PACKET_WORDS];
+    uint8_t  byte_data[8];    // NOS_RECEIVED_PACKET_WORDS << 2];
 } received_packet_t;
 
 enum {READ_REGISTER_CMD=0, WRITE_REGISTER_CMD=1};
@@ -94,11 +110,27 @@ enum {PWM_PERIOD=0, PWM_ON_TIME=1, PWM_CONFIG=2, PWM_STATUS=3};
 //
 enum {QE_COUNT_BUFFER=0, QE_TURN_BUFFER=1, QE_SPEED_BUFFER=2, QE_SIM_PHASE_TIME=3,
       QE_COUNTS_PER_REV=4, QE_CONFIG=5, QE_STATUS=6};
+//
+// constants to define bits in QE config register
 
+#define  QE_CONFIG_DEFAULT    0x00
+enum {QE_SIG_EXT=0x00, QE_SIG_INT_SIM=0x02};
+enum {QE_INT_SIM_DISABLE=0x0, QE_INT_SIM_ENABLE=0x04};
+enum {QE_SIM_DIR_FORWARD=0x0, QE_SIM_DIR_BACKWARD=0x08};
+enum {QE_NO_SWAP_AB=0x00, QE_SWAP_AB=0x10};
+enum {QE_SPEED_CALC_DISABLE=0x00, QE_SPEED_CALC_ENABLE=0x10000};
+enum {QE_SPEED_CALC_FILTER_DISABLE=0x00, QE_SPEED_CALC_FILTER_ENABLE=0x20000};
+enum {QE_FILTER_SAMPLE_2=0x00, QE_FILTER_SAMPLE_4=0x100000, QE_FILTER_SAMPLE_8=0x200000,
+      QE_FILTER_SAMPLE_16=0x300000, QE_FILTER_SAMPLE_32=0x400000};
+     
 // RC servo registers
 //
 enum {RC_SERVO_PERIOD=0, RC_SERVO_CONFIG=1, RC_SERVO_STATUS=2, RC_SERVO_ON_TIME=3};
 
+//
+// constants to define bits in PWM config register
+
+#define  PWM_CONFIG_DEFAULT    0x00
 enum {PWM_OFF=0x0, PWM_ON=0x1};
 enum {INT_H_BRIDGE_OFF=0x0, INT_H_BRIDGE_ON=0x10000};
 enum {EXT_H_BRIDGE_OFF=0x0, EXT_H_BRIDGE_ON=0x20000};
@@ -117,14 +149,18 @@ enum {BACKWARD, FORWARD};
 //DigitalIn  uP_handshake_2(ASYNC_UP_HANDSHAKE_2_PIN);
     
 class FPGA_bus {
-public:  
-     FPGA_bus(int nos_PWM    = NOS_PWM_CHANNELS , 
-              int nos_QE     = NOS_QE_CHANNELS  , 
-              int nos_servo  = NOS_RC_CHANNELS );  // constructor
- 
+public:
+     FPGA_bus(int nos_PWM, int nos_QE, int nos_servo);  // constructor
+ //    FPGA_bus();                                        // constructor
      
-     void     initialise(void); 
+    void initialise(void); 
+    void do_transaction(uint32_t command, 
+                        uint32_t register_address, 
+                        uint32_t register_data,
+                        uint32_t *data,
+                        uint32_t *status);
      uint32_t do_command(FPGA_packet_t cmd_packet);
+     void write_register(uint32_t register_addr, uint32_t value);
      void set_PWM_period(uint32_t channel, float frequency);
      void set_PWM_duty(uint32_t channel, float percentage);
      void PWM_enable(uint32_t channel);
@@ -134,8 +170,10 @@ public:
      void set_RC_pulse(uint32_t channel, uint32_t pulse_uS);
      void enable_RC_channel(uint32_t channel);
      void disable_RC_channel(uint32_t channel);
-     void enable_speed_measure(uint32_t channel);
+     void QE_config(uint32_t channel, uint32_t config_value);
+     void enable_speed_measure(uint32_t channel, uint32_t config_value, uint32_t phase_time);
      uint32_t read_speed_measure(uint32_t channel);
+     uint32_t read_count_measure(uint32_t channel);
      
      uint32_t get_SYS_data(void);
      
@@ -158,11 +196,6 @@ private:
                     uint32_t register_address, 
                     uint32_t register_data);
     void do_read(received_packet_t   *buffer);
-    void do_transaction(uint32_t command, 
-                        uint32_t register_address, 
-                        uint32_t register_data,
-                        uint32_t *data,
-                        uint32_t *status);
     
     DigitalOut async_uP_start;
     DigitalOut async_uP_handshake_1;
@@ -170,6 +203,8 @@ private:
     DigitalOut async_uP_reset;
     DigitalIn  uP_ack;
     DigitalIn  uP_handshake_2;
+    
+    DigitalOut log_pin;
     
     struct SYS_data {
         uint8_t major_version;

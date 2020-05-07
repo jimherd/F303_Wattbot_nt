@@ -1,6 +1,6 @@
-/*
- * General constants and typedef structres for Wattbot-nt robot
- */
+//***************************************************************************
+// Wattbot_nt.h : Constants and typedef structres for Wattbot-nt robot
+//***************************************************************************
 
 #include    <cstdint>
 #include    "mbed.h"
@@ -14,45 +14,31 @@
 //
 #define     COM_BAUD    115200
 
-//#define     MAX_DATA_BYTES_HLCONTROL_TO_LLCONTROL       16
-//#define     MAX_DATA_BYTES_LLCONTROL_TO_HLCONTROL       16
 
-
-
-//*********************************************************
+//***************************************************************************
 // System data structures
+//***************************************************************************
 //
 // Queues for connection to external hardware
 //
-// Queue of command being sent to FPGA from uP
+// 1. Queue of command being sent to FPGA from uP
 
 typedef struct {
-    uint8_t     register_number;
+    uint8_t     port;
     uint8_t     command;
+    uint8_t     register_number;
     uint32_t    data;
 } LLcontrol_to_FPGAcontrol_queue_t;
 
 //
-// queue of responses being sent to HLcontrol
+// 2. queue of responses being sent to HLcontrol
 
-// struct {
-//    uint8_t     port; 
-//    uint8_t     nos_bytes; 
-//    uint8_t     data[MAX_DATA_BYTES_LLCONTROL_TO_HLCONTROL];
-//} LLcontrol_to_HLcontrol_queue_t;
+typedef struct {
+    char    reply[80];
+} reply_t;
 
 
-//*********************************************************
-// format of data packets from HLcontrol (no longer using binary format)
-//
-//typedef struct {
-//    uint8_t     command;
-//    uint8_t     port;
-//    uint8_t     nos_bytes;
-//    uint8_t     data[MAX_DATA_BYTES_HLCONTROL_TO_LLCONTROL];
-//}  HLcontrol_LLcontrol_packet_t;
-
-//*********************************************************
+//***************************************************************************
 // Set of commands that can be sent fro HLcontrol to uP
 
 typedef enum {
@@ -66,26 +52,13 @@ typedef enum {
     uP_CONFIG,
     uP_STATUS
 } LLcontrol_commands_t;
- 
- //*********************************************************
- // error codes
 
-typedef enum {
-    OK                    =  0, 
-    CMD_FAIL              = -1,
-    CMD_STRING_TOO_BIG    = -2
-} error_codes_t;
-
-//********************
+//***************************************************************************
 // macros
 //
 #define SET_PROBE_1     probe_1_pin=1
 #define CLR_PROBE_1     probe_1_pin=0
 
-typedef struct {
-    char    reply[80];
-} reply_t;
 
-//extern Mail<reply_t, 8> HLcontrol_reply_queue;  // holds replies being sent to HLcontrol
 
 #endif

@@ -165,69 +165,28 @@ void reply_to_HLcontrol(uint32_t status)
 //***************************************************************************
 // execute_command : run processed command
 //
+
+#define  PING_CMD     (('p'<< 8) + 'i')
+
 uint32_t execute_command()
 {
     switch (command[0]) {
+        case 'r'    :       //read from FPGA register
+            return 2;
+            break;
+        case 'w'    :       // write to FPGA register
+            return 1;
+            break;
         case 'p' :          // PING
             reply_t *mail = HLcontrol_reply_queue.alloc();
-            sprintf(mail->reply, "%d 0\n", int_parameters[1]);
+            sprintf(mail->reply, "%d 0\r\n", int_parameters[1]);
             HLcontrol_reply_queue.put(mail);
             break;
     }
     return 0;
 }
 
-//***************************************************************************
-// ASCII_to_int : local version of atoi()
-//
-// String has already been checked therefore no need to test for errors
 
-int32_t ASCII_to_int(char *str) {
-
-int32_t result = 0;    // Initialize result
-int32_t sign = 1;      // Initialize sign as positive
-uint32_t char_pt = 0;  // Initialize index of first digit
-
-    if (*str == '\0') {
-        return 0;
-    }
-    if (str[0] == '-') {
-        sign = -1;
-        char_pt++; // Also update index of first digit
-    }
-     for (; str[char_pt] != '\0'; ++char_pt) {
-        result = (result * 10) + (str[char_pt] - '0');
-    }
-    return sign * result;
-}
-
-//***************************************************************************
-// ASCII_to_float : local version of atof()   *** TO BE CHECKED  ***
-//
-// String has already been checked therefore no need to test for errors
-// Saves 5K bytes of FLASH and therefore should be faster.
-
-float ASCII_to_float(const char *char_pt) {
-  float result = 0, fact = 1;
-    if (*char_pt == '-') {
-        char_pt++;
-        fact = -1;
-    };
-    for (uint32_t point_seen = 0; *char_pt == '\0'; char_pt++) {
-        if (*char_pt == '.') {
-            point_seen = 1;
-            continue;
-        }
-        uint32_t d = *char_pt - '0';
-//        if (d >= 0 && d <= 9) {
-            if (point_seen) {
-                fact = fact / 10.0f;
-            }
-        result = (result * 10.0f) + (float)d;
-//        };
-    };
-    return result * fact;
-};
 
 //***************************************************************************
 // Task code
