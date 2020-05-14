@@ -168,20 +168,31 @@ void reply_to_HLcontrol(uint32_t status)
 
 #define  PING_CMD     (('p'<< 8) + 'i')
 
-uint32_t execute_command()
-{
+uint32_t execute_command() {
     switch (command[0]) {
-        case 'r'    :       //read from FPGA register
-            return 2;
-            break;
-        case 'w'    :       // write to FPGA register
-            return 1;
-            break;
-        case 'p' :          // PING
+        case 'p' :  {        // PING
             reply_t *mail = HLcontrol_reply_queue.alloc();
             sprintf(mail->reply, "%d 0\r\n", int_parameters[1]);
             HLcontrol_reply_queue.put(mail);
             break;
+        }
+        case 'r'  :   {   //read from FPGA register
+            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.alloc();
+            FPGA_command->port            = int_parameters[0];
+            FPGA_command->command         = int_parameters[1];
+            FPGA_command->register_number = int_parameters[2];
+            FPGA_cmd_queue.put(FPGA_command);
+            break;
+        }
+        case 'w'    :  {  // write to FPGA register
+            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.alloc();
+            FPGA_command->port            = int_parameters[0];
+            FPGA_command->command         = int_parameters[1];
+            FPGA_command->register_number = int_parameters[2];
+            FPGA_command->data            = int_parameters[3];
+            FPGA_cmd_queue.put(FPGA_command);
+            break;
+        }     
     }
     return 0;
 }

@@ -2,7 +2,7 @@
 // ASCII_convert.cpp :  conversion routines for ASCII/int/float
 //***************************************************************************
 //
-// faster and lower overhead replacment for the following routines
+// faster and lower overhead replacments for the following routines
 //      1. atoi
 //      2. atof
 //      3. itoa
