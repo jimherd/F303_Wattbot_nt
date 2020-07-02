@@ -18,7 +18,6 @@
 #include    "rtos.h"
 
 #include    "FPGA_bus.h"
-#include    "SerialDriver.h"
 
 #include    "Wattbot_nt.h"
 #include    "error_codes.h"
@@ -39,7 +38,7 @@
 
 extern FPGA_bus  bus;
 extern DigitalOut  led1;
-extern SerialDriver HLcontrol;
+extern BufferedSerial HLcontrol;
 
 //***************************************************************************
 // Extern references to system queues

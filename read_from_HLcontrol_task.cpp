@@ -28,7 +28,7 @@ uint8_t     character;
 uint32_t    count, status;
 
     for(count=0 ; count < MAX_COMMAND_LENGTH ; count++) {
-        character = HLcontrol.getc();
+        HLcontrol.read(&character, 1);
         if (character == '\n') {
             command[count++] = '\0';
             command[count]   = '\n';
@@ -171,23 +171,26 @@ void reply_to_HLcontrol(uint32_t status)
 uint32_t execute_command() {
     switch (command[0]) {
         case 'p' :  {        // PING
-            reply_t *mail = HLcontrol_reply_queue.alloc();
+            reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
             sprintf(mail->reply, "%d 0\r\n", int_parameters[1]);
             HLcontrol_reply_queue.put(mail);
             break;
         }
         case 'r'  :   {   //read from FPGA register
-            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.alloc();
-            FPGA_command->port            = int_parameters[0];
-            FPGA_command->command         = int_parameters[1];
+//            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.alloc();
+            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            FPGA_command->port            = int_parameters[1];
+            FPGA_command->command         = READ_REGISTER_CMD;
             FPGA_command->register_number = int_parameters[2];
+            FPGA_command->data            = 42;            
             FPGA_cmd_queue.put(FPGA_command);
             break;
         }
         case 'w'    :  {  // write to FPGA register
-            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.alloc();
-            FPGA_command->port            = int_parameters[0];
-            FPGA_command->command         = int_parameters[1];
+//            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.alloc();
+            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            FPGA_command->port            = int_parameters[1];
+            FPGA_command->command         = WRITE_REGISTER_CMD;
             FPGA_command->register_number = int_parameters[2];
             FPGA_command->data            = int_parameters[3];
             FPGA_cmd_queue.put(FPGA_command);

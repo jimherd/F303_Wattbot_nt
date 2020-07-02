@@ -19,13 +19,9 @@
 void write_to_HLcontrol_task  (void)
 {
     FOREVER {
-        osEvent evt = HLcontrol_reply_queue.get();  // wait for mail
-        if (evt.status == osEventMail) {
-            reply_t *mail = (reply_t*)evt.value.p;
-
-            HLcontrol.puts(mail->reply);
-
+        reply_t *mail = HLcontrol_reply_queue.try_get_for(Kernel::wait_for_u32_forever);  // wait for mail
+            HLcontrol.write(mail->reply, strlen(mail->reply));
             HLcontrol_reply_queue.free(mail);
-        }
+//        }
     }
 }
