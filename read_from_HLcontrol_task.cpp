@@ -170,10 +170,20 @@ void reply_to_HLcontrol(uint32_t status)
 
 uint32_t execute_command() {
     switch (command[0]) {
-        case 'p' :  {        // PING
+        case 'p' :  {        // PING microcontroller
             reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
             sprintf(mail->reply, "%d 0\r\n", int_parameters[1]);
             HLcontrol_reply_queue.put(mail);
+            break;
+        }
+        case 'P' :  {        // PING FPGA
+            reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            FPGA_command->port            = int_parameters[1];
+            FPGA_command->command         = SOFT_PING_FPGA;
+            FPGA_command->register_number = NULL;
+            FPGA_command->data            = NULL;            
+            FPGA_cmd_queue.put(FPGA_command);
             break;
         }
         case 'r'  :   {   //read from FPGA register
@@ -199,8 +209,6 @@ uint32_t execute_command() {
     }
     return 0;
 }
-
-
 
 //***************************************************************************
 // Task code

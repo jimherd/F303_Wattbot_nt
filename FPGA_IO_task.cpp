@@ -15,9 +15,11 @@
 //
 // Description
 //      1. wait on message from FPGA command queue
-//      2. execute FPGA command
-//      3. create reply string with port, data, and status
-//      4. put reply onto reply return queue
+//      2. get reply message storage
+//      3. execute FPGA command
+//      4. create reply string with port, data, and status
+//      5. put reply onto reply return queue
+//      6. free command queue message memory
 //
 void FPGA_IO_task(void)
 {
@@ -27,23 +29,29 @@ uint32_t   status, data;
     FOREVER {
         LLcontrol_to_FPGAcontrol_queue_t *FPGA_cmd = FPGA_cmd_queue.try_get_for(Kernel::wait_for_u32_forever);  // wait for mail
 
-        bus.do_transaction(FPGA_cmd->command, FPGA_cmd->register_number , FPGA_cmd->data, &data, &status);
-
         reply_t *FPGA_reply = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+
+        switch (FPGA_cmd->command) {
+            case READ_REGISTER_CMD :
+            case WRITE_REGISTER_CMD : {
+                bus.do_transaction(FPGA_cmd->command, FPGA_cmd->register_number , FPGA_cmd->data, &data, &status);
+            //    sprintf(FPGA_reply->reply, "%d %d %d\r\n", FPGA_cmd->port, status, data);
+                break;
+            }
+            case SOFT_PING_FPGA : {
+                status = bus.soft_check_bus();
+                data = NULL;
+                break;
+            }
+            case HARD_PING_FPGA : {
+                break;
+            }
+        } // end switch
+        
         sprintf(FPGA_reply->reply, "%d %d %d\r\n", FPGA_cmd->port, status, data);
         HLcontrol_reply_queue.put(FPGA_reply);
 
         FPGA_cmd_queue.free(FPGA_cmd);
 
-        break;
     }
 }
-
-    //    HLcontrol.write(FPGA_cmd->reply, strlen(FPGA_cmd->reply));
-    //    HLcontrol_reply_queue.free(FPGA_cmd);
-    //    osEvent evt = FPGA_cmd_queue.get();  // wait for command from queue
-    //    if (evt.status == osEventMail) {
-    //    LLcontrol_to_FPGAcontrol_queue_t *FPGA_cmd = (LLcontrol_to_FPGAcontrol_queue_t*)evt.value.p;   
-    //    reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
-    //    sprintf(mail->reply, "%d 0\r\n", int_parameters[1]);
-    //    HLcontrol_reply_queue.put(mail);

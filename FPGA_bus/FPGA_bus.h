@@ -103,7 +103,7 @@ typedef union {
     uint8_t  byte_data[8];    // NOS_RECEIVED_PACKET_WORDS << 2];
 } received_packet_t;
 
-enum {READ_REGISTER_CMD=0, WRITE_REGISTER_CMD=1};
+enum {READ_REGISTER_CMD=0, WRITE_REGISTER_CMD=1, SOFT_PING_FPGA, HARD_PING_FPGA};
 enum {READ_BUS=0, WRITE_BUS=1};
 enum {LOW=0, HIGH=1};
 
