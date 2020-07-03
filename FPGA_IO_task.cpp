@@ -25,18 +25,25 @@ uint32_t   status, data;
 
     status = 0;
     FOREVER {
-        osEvent evt = FPGA_cmd_queue.get();  // wait for command from queue
-        if (evt.status == osEventMail) {
-            LLcontrol_to_FPGAcontrol_queue_t *FPGA_cmd = (LLcontrol_to_FPGAcontrol_queue_t*)evt.value.p;
-            
-            bus.do_transaction(FPGA_cmd->command, FPGA_cmd->register_number , FPGA_cmd->data, &data, &status);
-            
-            reply_t *FPGA_reply = HLcontrol_reply_queue.alloc();
-            sprintf(FPGA_reply->reply, "%d %d %d\r\n", FPGA_cmd->port, status, data);
-            HLcontrol_reply_queue.put(FPGA_reply);
+        LLcontrol_to_FPGAcontrol_queue_t *FPGA_cmd = FPGA_cmd_queue.try_get_for(Kernel::wait_for_u32_forever);  // wait for mail
 
-            FPGA_cmd_queue.free(FPGA_cmd);
-            break;
-        }
+        bus.do_transaction(FPGA_cmd->command, FPGA_cmd->register_number , FPGA_cmd->data, &data, &status);
+
+        reply_t *FPGA_reply = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+        sprintf(FPGA_reply->reply, "%d %d %d\r\n", FPGA_cmd->port, status, data);
+        HLcontrol_reply_queue.put(FPGA_reply);
+
+        FPGA_cmd_queue.free(FPGA_cmd);
+
+        break;
     }
 }
+
+    //    HLcontrol.write(FPGA_cmd->reply, strlen(FPGA_cmd->reply));
+    //    HLcontrol_reply_queue.free(FPGA_cmd);
+    //    osEvent evt = FPGA_cmd_queue.get();  // wait for command from queue
+    //    if (evt.status == osEventMail) {
+    //    LLcontrol_to_FPGAcontrol_queue_t *FPGA_cmd = (LLcontrol_to_FPGAcontrol_queue_t*)evt.value.p;   
+    //    reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+    //    sprintf(mail->reply, "%d 0\r\n", int_parameters[1]);
+    //    HLcontrol_reply_queue.put(mail);
