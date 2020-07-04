@@ -165,10 +165,16 @@ void reply_to_HLcontrol(uint32_t status)
 //***************************************************************************
 // execute_command : run processed command
 //
+//  S - RC servo commands
+//      Sc : config
+//      Sp : set pulse period in uS
+//      Sw : set width of pulse in uS
+//
+//  P - ping commands
+//      Pu : ping microcontroller
+//      Pf : ping FPGA 
 
-#define  PING_CMD     (('p'<< 8) + 'i')
-
-uint32_t execute_command() {
+uint32_t execute_command(void) {
     switch (command[0]) {
         case 'p' :  {        // PING microcontroller
             reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
@@ -205,7 +211,16 @@ uint32_t execute_command() {
             FPGA_command->data            = int_parameters[3];
             FPGA_cmd_queue.put(FPGA_command);
             break;
-        }     
+        }
+        case 's' : {
+            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            FPGA_command->port            = int_parameters[1];
+            FPGA_command->command         = RC_SERVO_CMD;
+            FPGA_command->register_number = int_parameters[2];
+            FPGA_command->data            = int_parameters[3];
+            FPGA_cmd_queue.put(FPGA_command);;
+            break;
+        }    
     }
     return 0;
 }

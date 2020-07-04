@@ -35,7 +35,6 @@ uint32_t   status, data;
             case READ_REGISTER_CMD :
             case WRITE_REGISTER_CMD : {
                 bus.do_transaction(FPGA_cmd->command, FPGA_cmd->register_number , FPGA_cmd->data, &data, &status);
-            //    sprintf(FPGA_reply->reply, "%d %d %d\r\n", FPGA_cmd->port, status, data);
                 break;
             }
             case SOFT_PING_FPGA : {
