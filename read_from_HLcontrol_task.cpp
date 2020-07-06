@@ -22,11 +22,12 @@ float       float_parameters[MAX_COMMAND_PARAMETERS];
 // read_command_from_HLcontrol : Read ASCII command string from HLcontrol
 //
 
-uint32_t read_command_from_HLcontrol(void) 
+int32_t read_command_from_HLcontrol(void) 
 {
 uint8_t     character;
-uint32_t    count, status;
+int32_t    count, status;
 
+    status = NO_ERROR;
     for(count=0 ; count < MAX_COMMAND_LENGTH ; count++) {
         HLcontrol.read(&character, 1);
         if (character == '\n') {
@@ -45,7 +46,7 @@ uint32_t    count, status;
         command[count++] = '\n';
         status = CMD_STRING_TOO_BIG;
     } else {
-        status = SUCCESS;
+        status = NO_ERROR;
     }
     character_count = count;
     return status;
@@ -63,14 +64,14 @@ uint32_t    count, status;
 // defines modes as scan progresses : U=undefined, I=integer, R=real, S=string
 //
 
-uint32_t parse_command (void) 
+int32_t parse_command (void) 
 {
-uint32_t    count, mode, status;
+int32_t    count, mode, status;
 uint8_t     character_type;
 
     argc = 0;
     mode = MODE_U;
-    status = SUCCESS;
+    status = NO_ERROR;
     for (count=0 ; count <= character_count ; count++) {
         character_type = char_type[command[count]];
         switch (character_type) {
@@ -132,7 +133,7 @@ uint8_t     character_type;
 //***************************************************************************
 // convert_tokens : convert relevant tokens to numerical values
 //
-uint32_t convert_tokens(void) 
+int32_t convert_tokens(void) 
 {
     if ((arg_type[0] != MODE_S) || (char_type[command[0]] != LETTER)) {
         return BAD_COMMAND;
@@ -151,16 +152,16 @@ uint32_t convert_tokens(void)
     if ((arg_type[1] != MODE_I) || (int_parameters[1] > 63)) {
         return BAD_PORT_NUMBER;
     }
-    return SUCCESS;
+    return NO_ERROR;
 }
 
 //***************************************************************************
 // reply_to_HLcontrol : send reply
 //
-void reply_to_HLcontrol(uint32_t status)
-{
-    return;
-}
+//void reply_to_HLcontrol(int32_t status)
+//{
+//    return;
+//}
 
 //***************************************************************************
 // execute_command : run processed command
@@ -171,29 +172,33 @@ void reply_to_HLcontrol(uint32_t status)
 //      Sw : set width of pulse in uS
 //
 //  P - ping commands
-//      Pu : ping microcontroller
+//      Pu : ping microcontroller (no contact with FPGA)
 //      Pf : ping FPGA 
 
-uint32_t execute_command(void) {
+int32_t execute_command(void) {
     switch (command[0]) {
-        case 'p' :  {        // PING microcontroller
-            reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
-            sprintf(mail->reply, "%d 0\r\n", int_parameters[1]);
-            HLcontrol_reply_queue.put(mail);
+        case 'P' : {
+            switch (command[1]) {
+                case 'u' :  {        // PING microcontroller
+                    reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+                    sprintf(mail->reply, "%d 0\r\n", int_parameters[1]);
+                    HLcontrol_reply_queue.put(mail);
+                    break;
+                }  // end case 'Su'
+                case 'f' :  {        // PING FPGA
+                    LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+                    FPGA_command->port            = int_parameters[1];
+                    FPGA_command->command         = SOFT_PING_FPGA;
+                    FPGA_command->register_number = NULL;
+                    FPGA_command->data            = NULL;            
+                    FPGA_cmd_queue.put(FPGA_command);
+                    break;
+                }  // end case 'Sf'
+            }
             break;
-        }
-        case 'P' :  {        // PING FPGA
-            reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
-            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
-            FPGA_command->port            = int_parameters[1];
-            FPGA_command->command         = SOFT_PING_FPGA;
-            FPGA_command->register_number = NULL;
-            FPGA_command->data            = NULL;            
-            FPGA_cmd_queue.put(FPGA_command);
-            break;
-        }
+        }   // end case 'P'
+
         case 'r'  :   {   //read from FPGA register
-//            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.alloc();
             LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
             FPGA_command->port            = int_parameters[1];
             FPGA_command->command         = READ_REGISTER_CMD;
@@ -202,8 +207,8 @@ uint32_t execute_command(void) {
             FPGA_cmd_queue.put(FPGA_command);
             break;
         }
+
         case 'w'    :  {  // write to FPGA register
-//            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.alloc();
             LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
             FPGA_command->port            = int_parameters[1];
             FPGA_command->command         = WRITE_REGISTER_CMD;
@@ -215,14 +220,29 @@ uint32_t execute_command(void) {
         case 's' : {
             LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
             FPGA_command->port            = int_parameters[1];
-            FPGA_command->command         = RC_SERVO_CMD;
-            FPGA_command->register_number = int_parameters[2];
-            FPGA_command->data            = int_parameters[3];
-            FPGA_cmd_queue.put(FPGA_command);;
+            FPGA_command->command         = WRITE_REGISTER_CMD;
+            switch (command[1]) {
+                case 'c' :  {        // PING microcontroller
+                    FPGA_command->register_number = int_parameters[2];
+                    FPGA_command->data            = int_parameters[3];
+                    break;
+                }
+                case 'p' : {
+                    FPGA_command->register_number = RC_BASE + RC_SERVO_PERIOD;
+                    FPGA_command->data            = int_parameters[2] * 50;
+                    break;
+                }
+                case 'w' : {
+                    FPGA_command->register_number = int_parameters[2];
+                    FPGA_command->data            = int_parameters[3];
+                    break;
+                }
+            }
+            FPGA_cmd_queue.put(FPGA_command);
             break;
-        }    
-    }
-    return 0;
+        }  // end case 'S'   
+    }  // end of main switch
+    return NO_ERROR;
 }
 
 //***************************************************************************
@@ -231,13 +251,23 @@ uint32_t execute_command(void) {
 //
 void read_from_HLcontrol_task(void)
 {
-uint32_t   status; 
+int32_t   status; 
 
-    status = 0;
+    status = NO_ERROR;
     FOREVER {
         status = read_command_from_HLcontrol();
-        status = parse_command();
-        status = convert_tokens();
-        status = execute_command(); 
+        if (status == NO_ERROR) {
+            status = parse_command();
+            if (status ==  NO_ERROR) {
+                status = convert_tokens();
+            }
+        }
+        if(status == NO_ERROR) {  
+            status = execute_command(); 
+        } else {  // return error message
+            reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            sprintf(mail->reply, "%d %d\r\n", int_parameters[1], status);
+            HLcontrol_reply_queue.put(mail);
+        } 
     }
 }

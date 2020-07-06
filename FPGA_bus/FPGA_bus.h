@@ -28,15 +28,15 @@
 #define LOG_PIN                   PB_8
 
 //
-//#define PWM_BASE            1
+#define PWM_BASE            1
 #define NOS_PWM_REGISTERS   4
 #define NOS_PWM_CHANNELS    1
 
-//#define QE_BASE             ((NOS_PWM_REGISTERS * NOS_PWM_CHANNELS) + PWM_BASE)
+#define QE_BASE             ((NOS_PWM_REGISTERS * NOS_PWM_CHANNELS) + PWM_BASE)
 #define NOS_QE_REGISTERS    7
 #define NOS_QE_CHANNELS     1
 
-//#define RC_BASE             ((NOS_QE_REGISTERS * NOS_QE_CHANNELS) + QE_BASE)
+#define RC_BASE             ((NOS_QE_REGISTERS * NOS_QE_CHANNELS) + QE_BASE)
 #define NOS_RC_CHANNELS     8
 #define GLOBAL_RC_ENABLE    0x80000000
 
@@ -76,6 +76,7 @@
 
 #define     nS_IN_uS                1000
 #define     FPGA_CLOCK_PERIOD_nS      20
+#define     FPGA_CLOCKS_IN_uS           50
 #define     uS_DELAY_BEFORE_TEST_HANDSHAKE      25
 #define     HANDSHAKE_TIMEOUT_COUNT      10000
 
