@@ -228,7 +228,7 @@ int32_t execute_command(void) {
                     break;
                 }
                 case 'p' : {
-                    FPGA_command->register_number = RC_BASE + RC_SERVO_PERIOD;
+                    FPGA_command->register_number = bus.RC_base + RC_SERVO_PERIOD;
                     FPGA_command->data            = int_parameters[2] * 50;
                     break;
                 }
