@@ -50,9 +50,9 @@ FPGA_bus::FPGA_bus(int nos_PWM   /* = NOS_PWM_CHANNELS */,
 void FPGA_bus:: do_reset(void)
 {
     async_uP_reset = LOW;       // generate low reset pulse
-    wait_us(20);
+    wait_us(FPGA_RESET_PULSE_WIDTH);
     async_uP_reset = HIGH;
-    wait_us(20);
+    wait_us(FPGA_RESET_PULSE_WIDTH);
 }
  
 //////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ int32_t     status;
 //
 // Test to see if FPGA is alive and well
 //    
-    status = hard_check_bus();
+    // status = hard_check_bus();
     if (status != NO_ERROR) {
         global_FPGA_unit_error_flag = status;
         return status;
@@ -94,8 +94,9 @@ int32_t     status;
 //
 // Seems OK, now read register 0 and get basic system parameters
 //
-    wait_us(1000);
+    //wait_us(1000);
     get_SYS_data();
+    //get_SYS_data();
     
     if (global_FPGA_unit_error_flag != NO_ERROR){
         return global_FPGA_unit_error_flag;
@@ -383,7 +384,7 @@ uint32_t FPGA_bus::read_count_measure(uint32_t channel)
 
 uint32_t FPGA_bus::get_SYS_data(void)
 {
-    do_transaction(READ_REGISTER_CMD, SYS_DATA_REG_ADDR, NULL, &data, &status);
+    do_transaction(READ_REGISTER_CMD, 1, NULL, &data, &status); // SYS_DATA_REG_ADDR
     sys_data.major_version          = (data & 0x0000000F);
     sys_data.minor_version          = (data >> 4)  & 0x0000000F;
     sys_data.number_of_PWM_channels = (data >> 8)  & 0x0000000F;

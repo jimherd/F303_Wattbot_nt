@@ -41,10 +41,12 @@ FPGA_bus  bus(1 /* PWM channel        */,
 DigitalOut  led1(LED1);
 DigitalOut  debug_pin(D15);
 
+char str[80];
+
 //***************************************************************************
 // Function templates
 //
-void         init(void);
+uint32_t         init(void);
 
 //***************************************************************************
 // task templates.
@@ -53,9 +55,9 @@ void read_from_HLcontrol_task (void);
 void write_to_HLcontrol_task  (void);
 void FPGA_IO_task(void);
 
-Thread read_from_HLcontrol(osPriorityNormal, OS_STACK_SIZE, NULL, NULL);
+Thread read_from_HLcontrol(osPriorityNormal, 8192, NULL, NULL);
 Thread write_to_HLcontrol(osPriorityNormal, OS_STACK_SIZE, NULL, NULL);
-Thread FPGA_IO(osPriorityNormal, OS_STACK_SIZE, NULL, NULL);
+Thread FPGA_IO(osPriorityBelowNormal, 8192, NULL, NULL);
 
 //***************************************************************************
 // Mutex semaphores
@@ -71,31 +73,46 @@ Mail<LLcontrol_to_FPGAcontrol_queue_t,8> FPGA_cmd_queue;
 //***************************************************************************
 // ** init   initialise hardware and system
 //
-void init(void)
+uint32_t init(void)
 {
 //
 // initialise hardware
 //
     HLcontrol.set_baud(COM_BAUD);
- //   Sys_Debug.set_baud(COM_BAUD);
     bus.initialise();
+    if (bus.global_FPGA_unit_error_flag != NO_ERROR) {
+        sprintf(str, "D: bus init error : %d\r\n", bus.global_FPGA_unit_error_flag);
+        HLcontrol.write(str, strlen(str));
+        return bus.global_FPGA_unit_error_flag;
+    }
+    bus.soft_check_bus();
 
-    HLcontrol.write("*", 1);
+    sprintf(str, "D: PWM channels : %d\n", bus.sys_data.number_of_PWM_channels);
+    HLcontrol.write(str, strlen(str));
 //
 // start system tasks
 //
     read_from_HLcontrol.start(callback(read_from_HLcontrol_task));
     write_to_HLcontrol.start(callback(write_to_HLcontrol_task));
     FPGA_IO.start(callback(FPGA_IO_task));
+
+    return NO_ERROR;
 }
 
 //***************************************************************************
 // ** main   
 //
-int main() {
-  init();
-//  printf("\n\n*** RTOS basic example ***\n");
-  //Sys_Debug.printf("System started\n");
+int main() 
+{
+uint32_t status;
+
+    status = init();
+    if (status != NO_ERROR) {
+        led1 = 1;
+        HANG;
+    }
+    string_to_queue((char *)"D:  System started\n");
+  
 
   while (true) {
     led1 = !led1;

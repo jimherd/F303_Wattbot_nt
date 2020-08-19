@@ -27,9 +27,9 @@
 // 1. Queue of command being sent to FPGA from uP
 
 typedef struct {
-    uint8_t     port;
-    uint8_t     command;
-    uint8_t     register_number;
+    uint8_t    port;
+    uint8_t    command;
+    uint8_t    register_number;
     uint32_t    data;
 } LLcontrol_to_FPGAcontrol_queue_t;
 

@@ -7,6 +7,7 @@
 // Read commands from UART input channel that connects to High Level
 // control computer.  Parse and execute.
 
+#include  "sys_routines.h"
 #include  "globals.h"
 
 //***************************************************************************
@@ -176,15 +177,18 @@ int32_t convert_tokens(void)
 //      Pf : ping FPGA 
 
 int32_t execute_command(void) {
+
+    uint32_t data, status;
+
     switch (command[0]) {
         case 'P' : {
             switch (command[1]) {
                 case 'u' :  {        // PING microcontroller
                     reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
-                    sprintf(mail->reply, "%d 0\r\n", int_parameters[1]);
+                    sprintf(mail->reply, "%d 0\n", int_parameters[1]);
                     HLcontrol_reply_queue.put(mail);
                     break;
-                }  // end case 'Su'
+                }  // end case 'Pu'
                 case 'f' :  {        // PING FPGA
                     LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
                     FPGA_command->port            = int_parameters[1];
@@ -193,7 +197,7 @@ int32_t execute_command(void) {
                     FPGA_command->data            = NULL;            
                     FPGA_cmd_queue.put(FPGA_command);
                     break;
-                }  // end case 'Sf'
+                }  // end case 'Pf'
             }
             break;
         }   // end case 'P'
@@ -203,7 +207,8 @@ int32_t execute_command(void) {
             FPGA_command->port            = int_parameters[1];
             FPGA_command->command         = READ_REGISTER_CMD;
             FPGA_command->register_number = int_parameters[2];
-            FPGA_command->data            = 42;            
+            FPGA_command->data            = NULL; 
+                string_to_queue((char *)"D: Received r CMD\n");
             FPGA_cmd_queue.put(FPGA_command);
             break;
         }
@@ -217,12 +222,12 @@ int32_t execute_command(void) {
             FPGA_cmd_queue.put(FPGA_command);
             break;
         }
-        case 's' : {
+        case 'S' : {
             LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
             FPGA_command->port            = int_parameters[1];
             FPGA_command->command         = WRITE_REGISTER_CMD;
             switch (command[1]) {
-                case 'c' :  {        // PING microcontroller
+                case 'c' :  {     
                     FPGA_command->register_number = int_parameters[2];
                     FPGA_command->data            = int_parameters[3];
                     break;

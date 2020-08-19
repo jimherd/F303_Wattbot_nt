@@ -1,11 +1,13 @@
 //***************************************************************************
-// ASCII_convert.cpp :  conversion routines for ASCII/int/float
+// sys_routines.cpp :  useful routines
 //***************************************************************************
 //
-// faster and lower overhead replacments for the following routines
-//      1. atoi
-//      2. atof
-//      3. itoa
+// 1. faster and lower overhead replacments for the following routines
+//      a. atoi
+//      b. atof
+//      c. itoa
+// 2. send strings through queue to HLLControl system
+//
 
 #include  "globals.h"
 
@@ -93,3 +95,16 @@ char* int_to_ASCII(int32_t num, char* str)
     str[i] = ' '; // Append string terminator 
     return str; 
 } 
+
+//***************************************************************************
+// string_to_queue : send ASCII string to HLLControl
+//
+
+void string_to_queue(const char *str) 
+{
+    reply_t *string_reply = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+
+    sprintf(string_reply->reply, "%s", str);
+    HLcontrol_reply_queue.put(string_reply);
+}
+

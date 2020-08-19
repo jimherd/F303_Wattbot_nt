@@ -1,11 +1,11 @@
 //***************************************************************************
-// ASCII_convert.h : ASCII conversion routines
+// sys_routines.h : ASCII conversion routines
 //***************************************************************************
 
  #include    <cstdint>
  
-#ifndef  ASCII_CONVERT_H
-#define  ASCII_CONVERT_H
+#ifndef  SYS_ROUTINES_H
+#define  SYS_ROUTINES_H
 
 //***************************************************************************
 // Function templates
@@ -13,5 +13,6 @@
 int32_t ASCII_to_int(char *str);
 float ASCII_to_float(const char *char_pt);
 char* int_to_ASCII(int32_t num, char* str);
+void string_to_queue(const char *str);
 
 #endif

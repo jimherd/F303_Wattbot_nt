@@ -65,8 +65,8 @@
     #define NOS_RECEIVED_PACKET_WORDS  1
 #endif
 
-#define SET_BUS_INPUT             (GPIOC->MODER = (GPIOC->MODER & 0xFFFF0000))
-#define SET_BUS_OUTPUT            (GPIOC->MODER = ((GPIOC->MODER & 0xFFFF0000) | 0x00005555))
+#define SET_BUS_INPUT             (GPIOC->MODER = (GPIOC->MODER & 0xFFFFFF00))
+#define SET_BUS_OUTPUT            (GPIOC->MODER = ((GPIOC->MODER & 0xFFFFFF00) | 0x00000055))
 #define OUTPUT_BYTE_TO_BUS(value) (GPIOC->ODR = ((GPIOC->ODR & 0x0000FF00) | (value & 0x000000FF)))
 #define INPUT_BYTE_FROM_BUS       (GPIOC->IDR & 0x000000FF)
 #define ENABLE_GPIO_SUBSYSTEM     (RCC->AHBENR |= RCC_AHBENR_GPIOCEN)
@@ -74,10 +74,11 @@
 //////////////////////////////////////////////////////////////////////////
 // FPGA constants
 
-#define     nS_IN_uS                1000
-#define     FPGA_CLOCK_PERIOD_nS      20
+#define     nS_IN_uS                          1000
+#define     FPGA_CLOCK_PERIOD_nS                20
 #define     uS_DELAY_BEFORE_TEST_HANDSHAKE      25
-#define     HANDSHAKE_TIMEOUT_COUNT      10000
+#define     HANDSHAKE_TIMEOUT_COUNT          10000
+#define     FPGA_RESET_PULSE_WIDTH              20    // microseconds
 
 //////////////////////////////////////////////////////////////////////////
 // error codes
@@ -187,11 +188,13 @@ public:
      uint32_t read_count_measure(uint32_t channel);
      uint32_t get_SYS_data(void);
      int32_t  soft_check_bus(void);
+     int32_t  hard_check_bus(void);
 //
 // data
 //   
      int32_t global_FPGA_unit_error_flag;
      uint32_t    PWM_base, QE_base, RC_base;
+     uint32_t data, status;
 //
 // persistant system data
 //
@@ -213,7 +216,7 @@ private:
     uint32_t    _nos_QE_units;
     uint32_t    _nos_servo_units;
     
-    uint32_t data, status, tmp_config;
+    uint32_t  tmp_config;
     received_packet_t   in_pkt;
 //
 // functions
@@ -227,7 +230,6 @@ private:
                         uint32_t register_data);
     void     do_read(received_packet_t   *buffer);
     void     do_reset(void);
-    int32_t  hard_check_bus(void);
     void     update_FPGA_register_pointers(void);
 //
 // Hardware digital I/O lines
