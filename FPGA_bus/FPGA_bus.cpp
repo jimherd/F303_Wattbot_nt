@@ -94,9 +94,7 @@ int32_t     status;
 //
 // Seems OK, now read register 0 and get basic system parameters
 //
-    //wait_us(1000);
     get_SYS_data();
-    //get_SYS_data();
     
     if (global_FPGA_unit_error_flag != NO_ERROR){
         return global_FPGA_unit_error_flag;
@@ -195,10 +193,10 @@ void FPGA_bus::do_read(received_packet_t   *buffer)
 // ==============
 
 void FPGA_bus::do_transaction(uint32_t command, 
-                    uint32_t register_address, 
-                    uint32_t register_data,
-                    uint32_t *data,
-                    uint32_t *status)
+                              uint32_t register_address, 
+                              uint32_t register_data,
+                              uint32_t *data,
+                              uint32_t *status)
 {
     log_pin = HIGH;
     do_start();
@@ -384,7 +382,7 @@ uint32_t FPGA_bus::read_count_measure(uint32_t channel)
 
 uint32_t FPGA_bus::get_SYS_data(void)
 {
-    do_transaction(READ_REGISTER_CMD, 1, NULL, &data, &status); // SYS_DATA_REG_ADDR
+    do_transaction(READ_REGISTER_CMD, SYS_DATA_REG_ADDR, NULL, &data, &status);
     sys_data.major_version          = (data & 0x0000000F);
     sys_data.minor_version          = (data >> 4)  & 0x0000000F;
     sys_data.number_of_PWM_channels = (data >> 8)  & 0x0000000F;

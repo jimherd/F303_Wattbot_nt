@@ -12,7 +12,7 @@
 // an interface between the high-level control computer and the FPGA system.
 //
 // Processor : STM32F303RE
-// Framework : Mbed V5 (with RTOS)
+// Framework : Mbed V6 (with RTOS)
 // IDE       : Mbed Studio
 // Compiler  : Arm V6
 // SCC       : GIT/GITHUB

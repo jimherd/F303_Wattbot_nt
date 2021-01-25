@@ -34,19 +34,23 @@ char str[80];
 
         switch (FPGA_cmd->command) {
             case READ_REGISTER_CMD : {
-                string_to_queue((char *)"D: READ_REGISTER_CMD\n");
+                //string_to_queue((char *)"D: READ_REGISTER_CMD\n");
                 //bus.do_transaction(READ_REGISTER_CMD, 0 , 0, &bus.data, &bus.status);
                 bus.do_transaction(FPGA_cmd->command, FPGA_cmd->register_number , FPGA_cmd->data, &data, &status);
                 break;
             }
             case WRITE_REGISTER_CMD : {
+                sprintf(str, "D: W_cmd, %d %d\n",FPGA_cmd->register_number , FPGA_cmd->data );
+                string_to_queue((char *)str);
                 bus.do_transaction(FPGA_cmd->command, FPGA_cmd->register_number , FPGA_cmd->data, &data, &status);
+                sprintf(str, "D: W_cmd, %d %d\n",data , status );
+                string_to_queue((char *)str);
                 break;
             }
             case SOFT_PING_FPGA : {
-                string_to_queue((char *)"D: to do soft FPGA ping\n");
+                //string_to_queue((char *)"D: to do soft FPGA ping\n");
                 status = bus.soft_check_bus();
-                string_to_queue((char *)"D: soft FPGA ping complete\n");
+                //string_to_queue((char *)"D: soft FPGA ping complete\n");
                 data = NULL;
                 break;
             }

@@ -208,7 +208,7 @@ int32_t execute_command(void) {
             FPGA_command->command         = READ_REGISTER_CMD;
             FPGA_command->register_number = int_parameters[2];
             FPGA_command->data            = NULL; 
-                string_to_queue((char *)"D: Received r CMD\n");
+            //    string_to_queue((char *)"D: Received r CMD\n");
             FPGA_cmd_queue.put(FPGA_command);
             break;
         }
@@ -271,7 +271,7 @@ int32_t   status;
             status = execute_command(); 
         } else {  // return error message
             reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
-            sprintf(mail->reply, "%d %d\r\n", int_parameters[1], status);
+            sprintf(mail->reply, "%d %d\n", int_parameters[1], status);
             HLcontrol_reply_queue.put(mail);
         } 
     }
