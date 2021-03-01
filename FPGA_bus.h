@@ -25,6 +25,13 @@
 #define ASYNC_UP_ACK_PIN          PB_4
 #define ASYNC_UP_RESET_PIN        PB_5
 
+#define PB_1_BIT_MASK        0x02
+#define SET_HANDSHAKE_1     (GPIOB->BSRR = PB_1_BIT_MASK)
+#define RESET_HANDSHAKE_1   (GPIOB->BSRR = (PB_1_BIT_MASK << 16))
+
+#define PB_2_BIT_MASK        0x04
+#define GET_HANDSHAKE_2      (GPIOB->IDR & PB_2_BIT_MASK)
+
 #define LOG_PIN                   PB_8
 
 //
@@ -246,4 +253,3 @@ private:
 };
  
  #endif
- 

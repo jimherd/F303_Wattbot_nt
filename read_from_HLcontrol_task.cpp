@@ -8,6 +8,7 @@
 // control computer.  Parse and execute.
 
 #include  "sys_routines.h"
+#include    "FPGA_bus.h"
 #include  "globals.h"
 
 //***************************************************************************

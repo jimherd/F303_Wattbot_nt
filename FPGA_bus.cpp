@@ -129,16 +129,18 @@ void FPGA_bus::do_end(void)
 //////////////////////////////////////////////////////////////////////////
 // write_byte : write a byte of data to the FPGA
 // ==========
+//
+// use   __attribute__((always_inline))   to force inline compilation
 
-void FPGA_bus::write_byte(uint32_t byte_value)
+void  FPGA_bus::write_byte(uint32_t byte_value)
 {
     SET_BUS_OUTPUT;
     OUTPUT_BYTE_TO_BUS(byte_value);
     async_uP_RW = WRITE_BUS;
-    async_uP_handshake_1 = HIGH;
+    SET_HANDSHAKE_1;   //async_uP_handshake_1 = HIGH;
     while (uP_handshake_2 == LOW)
         ;
-    async_uP_handshake_1 = LOW;
+    RESET_HANDSHAKE_1;   //async_uP_handshake_1 = LOW;
     while (uP_handshake_2 == HIGH)
         ;
 }
@@ -151,13 +153,13 @@ uint32_t FPGA_bus::read_byte(void)
 {
     SET_BUS_INPUT;
     async_uP_RW = READ_BUS;
-    while (uP_handshake_2 == LOW)
+    while (GET_HANDSHAKE_2 == 0) //while (uP_handshake_2 == LOW)
         ;
     data = INPUT_BYTE_FROM_BUS;
-    async_uP_handshake_1 = HIGH;
-    while (uP_handshake_2 == HIGH)
+    SET_HANDSHAKE_1;   // async_uP_handshake_1 = HIGH;
+    while (GET_HANDSHAKE_2 != 0) // while (uP_handshake_2 == HIGH)
         ;
-    async_uP_handshake_1 = LOW;
+    RESET_HANDSHAKE_1;   // async_uP_handshake_1 = LOW;
     return data;
 }
 
@@ -183,9 +185,20 @@ void FPGA_bus::do_write(uint32_t command,
 
 void FPGA_bus::do_read(received_packet_t   *buffer)
 {
-    for (int i=0; i < (NOS_RECEIVED_PACKET_WORDS<<2) ; i++) {
-        buffer->byte_data[i] = (uint8_t)read_byte();
-    }
+    // for (int i=0; i < (NOS_RECEIVED_PACKET_WORDS<<2) ; i++) {
+    //    buffer->byte_data[i] = (uint8_t)read_byte();
+    // }
+    buffer->byte_data[0] = (uint8_t)read_byte();
+    buffer->byte_data[1] = (uint8_t)read_byte();
+    buffer->byte_data[2] = (uint8_t)read_byte();
+    buffer->byte_data[3] = (uint8_t)read_byte();
+
+    #ifdef INCLUDE_32_BIT_STATUS_RETURN
+        buffer->byte_data[4] = (uint8_t)read_byte();
+        buffer->byte_data[5] = (uint8_t)read_byte();
+        buffer->byte_data[6] = (uint8_t)read_byte();
+        buffer->byte_data[7] = (uint8_t)read_byte();
+    #endif
 }
 
 //////////////////////////////////////////////////////////////////////////
