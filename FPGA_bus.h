@@ -6,6 +6,7 @@
  * Version 0.1 : initial release
  */
 #include "mbed.h"
+#include "compile_config.h"
 
 #ifndef  FPGA_bus_H
 #define  FPGA_bus_H
@@ -26,11 +27,20 @@
 #define ASYNC_UP_RESET_PIN        PB_5
 
 #define PB_1_BIT_MASK        0x02
-#define SET_HANDSHAKE_1     (GPIOB->BSRR = PB_1_BIT_MASK)
-#define RESET_HANDSHAKE_1   (GPIOB->BSRR = (PB_1_BIT_MASK << 16))
+#ifdef OPT_1
+    #define SET_HANDSHAKE_1     (GPIOB->BSRR = PB_1_BIT_MASK)
+    #define RESET_HANDSHAKE_1   (GPIOB->BSRR = (PB_1_BIT_MASK << 16))
+#else
+    #define SET_HANDSHAKE_1     async_uP_handshake_1 = HIGH
+    #define RESET_HANDSHAKE_1   async_uP_handshake_1 = LOW
+#endif
 
 #define PB_2_BIT_MASK        0x04
-#define GET_HANDSHAKE_2      (GPIOB->IDR & PB_2_BIT_MASK)
+#ifdef OPT_1
+    #define GET_HANDSHAKE_2      (GPIOB->IDR & PB_2_BIT_MASK)
+#else
+    #define GET_HANDSHAKE_2      uP_handshake_2
+#endif
 
 #define LOG_PIN                   PB_8
 
@@ -230,12 +240,24 @@ private:
 //
     void     do_start(void);
     void     do_end(void);
-    void     write_byte(uint32_t byte_value);
-    uint32_t read_byte(void);
-    void     do_write(  uint32_t command, 
+    #ifdef OPT_2
+        void     write_byte(uint32_t byte_value) __attribute__((always_inline));
+        uint32_t read_byte(void) __attribute__((always_inline));
+    #else
+        void     write_byte(uint32_t byte_value);
+        uint32_t read_byte(void);
+    #endif
+    #ifdef OPT_3
+        void     do_write(  uint32_t command, 
+                        uint32_t register_address, 
+                        uint32_t register_data)   __attribute__((always_inline));
+        void     do_read(received_packet_t   *buffer)  __attribute__((always_inline));
+    #else
+        void     do_write(  uint32_t command, 
                         uint32_t register_address, 
                         uint32_t register_data);
-    void     do_read(received_packet_t   *buffer);
+        void     do_read(received_packet_t   *buffer);
+    #endif
     void     do_reset(void);
     void     update_FPGA_register_pointers(void);
 //

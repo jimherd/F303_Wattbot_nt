@@ -130,7 +130,6 @@ void FPGA_bus::do_end(void)
 // write_byte : write a byte of data to the FPGA
 // ==========
 //
-// use   __attribute__((always_inline))   to force inline compilation
 
 void  FPGA_bus::write_byte(uint32_t byte_value)
 {
@@ -138,10 +137,10 @@ void  FPGA_bus::write_byte(uint32_t byte_value)
     OUTPUT_BYTE_TO_BUS(byte_value);
     async_uP_RW = WRITE_BUS;
     SET_HANDSHAKE_1;   //async_uP_handshake_1 = HIGH;
-    while (uP_handshake_2 == LOW)
+    while (GET_HANDSHAKE_2 == 0) //while (uP_handshake_2 == LOW)
         ;
     RESET_HANDSHAKE_1;   //async_uP_handshake_1 = LOW;
-    while (uP_handshake_2 == HIGH)
+    while (GET_HANDSHAKE_2 != 0) //while (uP_handshake_2 == HIGH)
         ;
 }
 
@@ -185,9 +184,11 @@ void FPGA_bus::do_write(uint32_t command,
 
 void FPGA_bus::do_read(received_packet_t   *buffer)
 {
-    // for (int i=0; i < (NOS_RECEIVED_PACKET_WORDS<<2) ; i++) {
+
+    //for (int i=0; i < (NOS_RECEIVED_PACKET_WORDS<<2) ; i++) {
     //    buffer->byte_data[i] = (uint8_t)read_byte();
-    // }
+    //}
+    
     buffer->byte_data[0] = (uint8_t)read_byte();
     buffer->byte_data[1] = (uint8_t)read_byte();
     buffer->byte_data[2] = (uint8_t)read_byte();

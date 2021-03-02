@@ -11,6 +11,8 @@
 //***************************************************************************
 // Necessary include files
 
+#include    "compile_config.h"
+
 #include    <cstdint>
 #include    <cstdlib>
 

@@ -7,7 +7,6 @@
 // Read commands from queue and generate/run FPGA commands
 
 #include  "Wattbot_nt.h"
-//#include  "FPGA_bus.h"
 #include  "globals.h"
 
 //***************************************************************************
