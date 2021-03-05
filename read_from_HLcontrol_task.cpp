@@ -184,13 +184,13 @@ int32_t execute_command(void) {
     switch (command[0]) {
         case 'P' : {
             switch (command[1]) {
-                case 'u' :  {        // PING microcontroller
+                case '1' :  {        // PING microcontroller
                     reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
                     sprintf(mail->reply, "%d 0\n", int_parameters[1]);
                     HLcontrol_reply_queue.put(mail);
                     break;
-                }  // end case 'Pu'
-                case 'f' :  {        // PING FPGA
+                }  // end case 'P1'
+                case '2' :  {        // SOFT PING FPGA
                     LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
                     FPGA_command->port            = int_parameters[1];
                     FPGA_command->command         = SOFT_PING_FPGA;
@@ -198,7 +198,25 @@ int32_t execute_command(void) {
                     FPGA_command->data            = NULL;            
                     FPGA_cmd_queue.put(FPGA_command);
                     break;
-                }  // end case 'Pf'
+                }  // end case 'P2
+                case '3' :  {        // HARD PING FPGA
+                    LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+                    FPGA_command->port            = int_parameters[1];
+                    FPGA_command->command         = HARD_PING_FPGA;
+                    FPGA_command->register_number = NULL;
+                    FPGA_command->data            = NULL;            
+                    FPGA_cmd_queue.put(FPGA_command);
+                    break;
+                }  // end case 'P3''
+                case '4' :  {        // Simple FPGA reset
+                    LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+                    FPGA_command->port            = int_parameters[1];
+                    FPGA_command->command         = FPGA_RESTART;
+                    FPGA_command->register_number = NULL;
+                    FPGA_command->data            = NULL;            
+                    FPGA_cmd_queue.put(FPGA_command);
+                    break;
+                }  // end case 'P4''
             }
             break;
         }   // end case 'P'

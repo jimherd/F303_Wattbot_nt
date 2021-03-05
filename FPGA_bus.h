@@ -26,10 +26,11 @@
 #define ASYNC_UP_ACK_PIN          PB_4
 #define ASYNC_UP_RESET_PIN        PB_5
 
-#define PB_1_BIT_MASK        0x02
+#define PB_1_BIT_SET_MASK              0x02
+#define PB_1_BIT_RESET_MASK      0x00020000
 #ifdef OPT_1
-    #define SET_HANDSHAKE_1     (GPIOB->BSRR = PB_1_BIT_MASK)
-    #define RESET_HANDSHAKE_1   (GPIOB->BSRR = (PB_1_BIT_MASK << 16))
+    #define SET_HANDSHAKE_1     (*(int *)0x48000418 = PB_1_BIT_SET_MASK)   //(GPIOB->BSRR = PB_1_BIT_MASK)
+    #define RESET_HANDSHAKE_1   (*(int *)0x48000418 = PB_1_BIT_RESET_MASK)// (GPIOB->BSRR = (PB_1_BIT_MASK << 16))
 #else
     #define SET_HANDSHAKE_1     async_uP_handshake_1 = HIGH
     #define RESET_HANDSHAKE_1   async_uP_handshake_1 = LOW
@@ -206,6 +207,7 @@ public:
      uint32_t get_SYS_data(void);
      int32_t  soft_check_bus(void);
      int32_t  hard_check_bus(void);
+     void     restart_FPGA(void);
 //
 // data
 //   
@@ -242,7 +244,7 @@ private:
     void     do_end(void);
     #ifdef OPT_2
         void     write_byte(uint32_t byte_value) __attribute__((always_inline));
-        uint32_t read_byte(void) __attribute__((always_inline));
+        uint32_t read_byte(void)                 __attribute__((always_inline));
     #else
         void     write_byte(uint32_t byte_value);
         uint32_t read_byte(void);
@@ -250,7 +252,7 @@ private:
     #ifdef OPT_3
         void     do_write(  uint32_t command, 
                         uint32_t register_address, 
-                        uint32_t register_data)   __attribute__((always_inline));
+                        uint32_t register_data)        __attribute__((always_inline));
         void     do_read(received_packet_t   *buffer)  __attribute__((always_inline));
     #else
         void     do_write(  uint32_t command, 

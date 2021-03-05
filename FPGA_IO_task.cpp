@@ -59,6 +59,12 @@ char str[80];
                 data = NULL;
                 break;
             }
+            case FPGA_RESTART : {
+                bus.restart_FPGA();
+                data = NULL;
+                status = NO_ERROR;
+                break;
+            }
         } // end switch
         
         sprintf(FPGA_reply->reply, "%d %d %d\n", FPGA_cmd->port, status, data);

@@ -13,6 +13,6 @@
 //***************************************************************************
 // Constants relevant to this task
 
-enum {READ_REGISTER=0, WRITE_REGISTER, SOFT_PING_FPGA, HARD_PING_FPGA};
+enum {READ_REGISTER=0, WRITE_REGISTER, SOFT_PING_FPGA, HARD_PING_FPGA, FPGA_RESTART};
 
 #endif

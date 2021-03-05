@@ -430,6 +430,20 @@ void FPGA_bus::update_FPGA_register_pointers(void) {
 }
 
 //////////////////////////////////////////////////////////////////////////
+// restart_FPGA : Restart FPGA system.
+// ============
+//
+void FPGA_bus::restart_FPGA(void) {
+    
+    async_uP_start       = LOW;
+    async_uP_reset       = HIGH;
+    async_uP_handshake_1 = LOW;
+    async_uP_RW          = LOW;
+    do_reset();
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 // hard_check_bus : verify that connection to FPGA is working (uses RESET)
 // ==============
 //
