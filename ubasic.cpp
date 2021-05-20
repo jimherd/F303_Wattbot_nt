@@ -44,6 +44,7 @@
 #include "globals.h"
 #include "tokenizer.h"
 #include "ubasic.h"
+#include <cstdint>
 
 //static char *program_ptr;
 #define MAX_STRINGLEN 40
@@ -685,7 +686,7 @@ void ubasic_run(void)
 //
 // Notes
 //
-uint8_t run_ubasic_program(char *program) {
+int32_t run_ubasic_program(char *program) {
 
     ubasic_init(program);
     do{

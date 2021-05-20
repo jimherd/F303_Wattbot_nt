@@ -30,12 +30,14 @@
 #ifndef __UBASIC_H__
 #define __UBASIC_H__
 
+#include    <cstdint>
+
 void ubasic_init(char *program);
 void ubasic_run(void);
-uint8_t run_ubasic_program(char *program);
+int32_t run_ubasic_program(char *program);
 int ubasic_finished(void);
 
-int ubasic_get_variable(int varnum);
+int32_t ubasic_get_variable(int varnum);
 void ubasic_set_variable(int varum, int value);
 
 // #define DEBUG 1

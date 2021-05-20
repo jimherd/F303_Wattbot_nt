@@ -26,6 +26,7 @@
 #include    "read_from_HLcontrol_task.h"
 #include    "write_to_HLcontrol_task.h"
 #include    "FPGA_IO_task.h"
+#include    "sequencer_task.h"
 #include    "ROM_data.h"
 #include    "sys_routines.h"
 

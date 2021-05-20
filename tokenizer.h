@@ -79,8 +79,8 @@ enum {
 //static char const *ptr, *nextptr;
 
 struct keyword_token {
-    char  *keyword;
-    int   token;
+    const char  *keyword;  // added const to meet c11 spec
+    int          token;
 };
 
 const struct keyword_token keywords[] = {
