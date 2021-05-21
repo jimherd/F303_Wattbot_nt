@@ -5,10 +5,11 @@
 #include    <cstdint>
 #include    "mbed.h"
 #include    "rtos.h"
+#include    "globals.h"
 
 #ifndef  WATTBOT_NT_H
 #define  WATTBOT_NT_H
-
+/*
 //***************************************************************************
 // COM port data
 //
@@ -22,9 +23,9 @@
 // System data structures
 //***************************************************************************
 //
-// Queues for connection to external hardware
+// Packet structures for queues to connection to external hardware
 //
-// 1. Queue of command being sent to FPGA from uP
+// 1. Structure of command sent to FPGA_IO task
 
 typedef struct {
     uint8_t    port;
@@ -34,11 +35,20 @@ typedef struct {
 } LLcontrol_to_FPGAcontrol_queue_t;
 
 //
-// 2. queue of responses being sent to HLcontrol
+// 2. Structure of response sent to HLcontrol
 
 typedef struct {
     char    reply[80];
 } reply_t;
+
+//
+// 3. Structure of command sent to sequencer task 
+
+typedef struct {
+    uint8_t    port;
+    uint8_t    sequence_number;
+    int32_t    parameters[NOS_SEQUENCE_PARAMETERS];
+} sequence_command_queue_t;
 
 
 //***************************************************************************
@@ -62,6 +72,6 @@ typedef enum {
 #define SET_PROBE_1     probe_1_pin=1
 #define CLR_PROBE_1     probe_1_pin=0
 
-
+*/
 
 #endif

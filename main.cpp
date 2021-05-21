@@ -22,7 +22,12 @@
 // April 2020
 //
 
-#include "globals.h"
+#include    "mbed.h"
+#include    "rtos.h"
+#include    "sys_routines.h"
+#include    "FPGA_bus.h"
+#include    "error_codes.h"
+#include    "globals.h"
 
 //***************************************************************************
 // Define hardware objects

@@ -7,8 +7,13 @@
 // Read commands from UART input channel that connects to High Level
 // control computer.  Parse and execute.
 
+#include  "read_from_HLcontrol_task.h"
+
 #include  "sys_routines.h"
 #include  "FPGA_bus.h"
+#include  "ROM_data.h"
+#include  "FPGA_IO_task.h"
+#include  "error_codes.h"
 #include  "globals.h"
 
 //***************************************************************************

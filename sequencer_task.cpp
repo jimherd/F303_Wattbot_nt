@@ -5,14 +5,15 @@
 // ==============
 //
 
-#include  "Wattbot_nt.h"
+#include  "sequencer_task.h"
 #include  "globals.h"
 
 
 //***************************************************************************
-// sequencer_task : 
 //
-// 
+// Description
+//      1. wait on message from sequence command queue
+
 
 void sequencer_task  (void)
 {

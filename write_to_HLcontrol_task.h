@@ -10,6 +10,6 @@
 //***************************************************************************
 // Function templates
 
-//uint32_t read_command_from_HLcontrol(void);
+uint32_t  write_to_HLcontrol_task(void);
 
 #endif

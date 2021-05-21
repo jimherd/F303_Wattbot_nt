@@ -23,6 +23,7 @@ This repository contains the code for the LLcontrol subsystem.
 - Communicate with HLcontrol computer through serial port
 - Communicate with FPGA through a fast bidirectional 8-bit bus
 - Implement PID contol of PWM/encoder DC motor channels
+- Run sequences of command written in ubasic scripting language
 - Run real-time clock(RTC) : battery backup system
 - interface to CAN bus
 - interface to Dynamixel digital servos

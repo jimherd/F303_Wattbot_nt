@@ -1,9 +1,8 @@
 //***************************************************************************
-// globals.h : file to hold some general system defines
+// globals.h : file to hold some global system defines/data structures/macros
 // =========
 //***************************************************************************
 //
-// Specific defines are in file "Wattbot_nt.h"
 
 #ifndef     GLOBALS_H
 #define     GLOBALS_H
@@ -18,23 +17,84 @@
 
 #include    "mbed.h"
 #include    "rtos.h"
-
 #include    "FPGA_bus.h"
 
-#include    "Wattbot_nt.h"
-#include    "error_codes.h"
-#include    "read_from_HLcontrol_task.h"
-#include    "write_to_HLcontrol_task.h"
-#include    "FPGA_IO_task.h"
-#include    "sequencer_task.h"
-#include    "ROM_data.h"
-#include    "sys_routines.h"
+//***************************************************************************
+// Constants relevant to overall system operation
+
+#define     NOS_SEQUENCE_PARAMETERS     4       // number of int parameters passed to sequencer task
+
 
 //***************************************************************************
-// Macros
+// COM port data
+//
+// JTH Laptop <--> F303 working baud rates
+//      115200, 128000, 230400, 256000, 460800
+//
+#define     COM_BAUD  256000      
+
+
+//***************************************************************************
+// System data structures
+//***************************************************************************
+//
+// Packet structures for queues to connection to external hardware
+//
+// 1. Structure of command sent to FPGA_IO task
+
+typedef struct {
+    uint8_t    port;
+    uint8_t    command;
+    uint8_t    register_number;
+    uint32_t    data;
+} LLcontrol_to_FPGAcontrol_queue_t;
+
+//
+// 2. Structure of response sent to HLcontrol
+
+typedef struct {
+    char    reply[80];
+} reply_t;
+
+//
+// 3. Structure of command sent to sequencer task 
+
+typedef struct {
+    uint8_t    port;
+    uint8_t    sequence_number;
+    int32_t    parameters[NOS_SEQUENCE_PARAMETERS];
+} sequence_command_queue_t;
+
+
+//***************************************************************************
+// Set of commands that can be sent fro HLcontrol to uP
+
+typedef enum {
+    PING = 1,
+    FPGA_WRITE,
+    FPGA_READ,
+    SET_PID,
+    READ_PID,
+    DYNAMIXEL_WRITE,
+    DYNAMIXEL_READ,
+    uP_CONFIG,
+    uP_STATUS
+} LLcontrol_commands_t;
+
+//***************************************************************************
+// macros
+//
+#define SET_PROBE_1     probe_1_pin=1
+#define CLR_PROBE_1     probe_1_pin=0
+
+
+
+//***************************************************************************
+// Global Macros
 
 #define     FOREVER     for(;;)
 #define     HANG        for(;;)
+
 
 //***************************************************************************
 // Extern references to hardware interfaces
