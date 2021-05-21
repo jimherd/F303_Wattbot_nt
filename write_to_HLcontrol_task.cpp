@@ -18,7 +18,7 @@
 void write_to_HLcontrol_task  (void)
 {
     FOREVER {
-        reply_t *mail = HLcontrol_reply_queue.try_get_for(Kernel::wait_for_u32_forever);  // wait for mail
+        reply_packet_t *mail = HLcontrol_reply_queue.try_get_for(Kernel::wait_for_u32_forever);  // wait for mail
             HLcontrol.write(mail->reply, strlen(mail->reply));
             HLcontrol_reply_queue.free(mail);
 //        }

@@ -190,13 +190,13 @@ int32_t execute_command(void) {
         case 'P' : {
             switch (command[1]) {
                 case '1' :  {        // PING microcontroller
-                    reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+                    reply_packet_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
                     sprintf(mail->reply, "%d 0\n", int_parameters[1]);
                     HLcontrol_reply_queue.put(mail);
                     break;
                 }  // end case 'P1'
                 case '2' :  {        // SOFT PING FPGA
-                    LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+                    LLcontrol_to_FPGAcontrol_packet_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
                     FPGA_command->port            = int_parameters[1];
                     FPGA_command->command         = SOFT_PING_FPGA;
                     FPGA_command->register_number = NULL;
@@ -205,7 +205,7 @@ int32_t execute_command(void) {
                     break;
                 }  // end case 'P2
                 case '3' :  {        // HARD PING FPGA
-                    LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+                    LLcontrol_to_FPGAcontrol_packet_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
                     FPGA_command->port            = int_parameters[1];
                     FPGA_command->command         = HARD_PING_FPGA;
                     FPGA_command->register_number = NULL;
@@ -214,7 +214,7 @@ int32_t execute_command(void) {
                     break;
                 }  // end case 'P3''
                 case '4' :  {        // Simple FPGA reset
-                    LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+                    LLcontrol_to_FPGAcontrol_packet_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
                     FPGA_command->port            = int_parameters[1];
                     FPGA_command->command         = FPGA_RESTART;
                     FPGA_command->register_number = NULL;
@@ -227,7 +227,7 @@ int32_t execute_command(void) {
         }   // end case 'P'
 
         case 'r'  :   {   //read from FPGA register
-            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            LLcontrol_to_FPGAcontrol_packet_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
             FPGA_command->port            = int_parameters[1];
             FPGA_command->command         = READ_REGISTER_CMD;
             FPGA_command->register_number = int_parameters[2];
@@ -238,7 +238,7 @@ int32_t execute_command(void) {
         }
 
         case 'w'    :  {  // write to FPGA register
-            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            LLcontrol_to_FPGAcontrol_packet_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
             FPGA_command->port            = int_parameters[1];
             FPGA_command->command         = WRITE_REGISTER_CMD;
             FPGA_command->register_number = int_parameters[2];
@@ -247,7 +247,7 @@ int32_t execute_command(void) {
             break;
         }
         case 'S' : {
-            LLcontrol_to_FPGAcontrol_queue_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            LLcontrol_to_FPGAcontrol_packet_t *FPGA_command = FPGA_cmd_queue.try_alloc_for(Kernel::wait_for_u32_forever);
             FPGA_command->port            = int_parameters[1];
             FPGA_command->command         = WRITE_REGISTER_CMD;
             switch (command[1]) {
@@ -294,7 +294,7 @@ int32_t   status;
         if(status == NO_ERROR) {  
             status = execute_command(); 
         } else {  // return error message
-            reply_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            reply_packet_t *mail = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
             sprintf(mail->reply, "%d %d\n", int_parameters[1], status);
             HLcontrol_reply_queue.put(mail);
         } 

@@ -30,9 +30,9 @@ uint32_t   status, data;
 char str[80];
     status = 0;
     FOREVER {
-        LLcontrol_to_FPGAcontrol_queue_t *FPGA_cmd = FPGA_cmd_queue.try_get_for(Kernel::wait_for_u32_forever);  // wait for mail
+        LLcontrol_to_FPGAcontrol_packet_t *FPGA_cmd = FPGA_cmd_queue.try_get_for(Kernel::wait_for_u32_forever);  // wait for mail
 
-        reply_t *FPGA_reply = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+        reply_packet_t *FPGA_reply = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
 
         switch (FPGA_cmd->command) {
             case READ_REGISTER_CMD : {

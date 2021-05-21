@@ -71,9 +71,18 @@ Thread FPGA_IO(osPriorityBelowNormal, 8192, NULL, NULL);
 
 //***************************************************************************
 // Mail queues
- 
-Mail<reply_t, 8> HLcontrol_reply_queue;  // holds replies being sent to HLcontrol
-Mail<LLcontrol_to_FPGAcontrol_queue_t,8> FPGA_cmd_queue;
+//
+// Queue 1 : FPGA commands
+//
+Mail<LLcontrol_to_FPGAcontrol_packet_t,8> FPGA_cmd_queue;
+
+// Queue 2 : replies to high level controller
+//
+Mail<reply_packet_t, 8> HLcontrol_reply_queue;  // holds replies being sent to HLcontrol
+
+// Queue 3 : commands to sequencer task
+//
+Mail<sequence_command_packet_t, 4> sequence_command_queue;
 
 //***************************************************************************
 // ** init   initialise hardware and system

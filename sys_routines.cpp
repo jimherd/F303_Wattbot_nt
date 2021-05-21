@@ -102,7 +102,7 @@ char* int_to_ASCII(int32_t num, char* str)
 
 void string_to_queue(const char *str) 
 {
-    reply_t *string_reply = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+    reply_packet_t *string_reply = HLcontrol_reply_queue.try_alloc_for(Kernel::wait_for_u32_forever);
 
     sprintf(string_reply->reply, "%s", str);
     HLcontrol_reply_queue.put(string_reply);
