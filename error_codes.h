@@ -4,8 +4,8 @@
 //
 // Central collection of system error codes
 
-#ifndef     ERROR_CODES_H
-#define     ERROR_CODES_H
+#ifndef     _ERROR_CODES_H_
+#define     _ERROR_CODES_H_
 
 //*********************************************************
  // error codes

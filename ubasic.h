@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  *
  */
-#ifndef __UBASIC_H__
-#define __UBASIC_H__
+#ifndef _UBASIC_H_
+#define _UBASIC_H_
 
 #include    <cstdint>
 

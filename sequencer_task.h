@@ -4,8 +4,8 @@
 
  #include    <cstdint>
  
-#ifndef  sequencer_task_H
-#define  sequencer_task_H
+#ifndef  _SEQUENCER_TASK_H_
+#define  _SEQUENCER_TASK_H_
 
 //***************************************************************************
 // Function templates

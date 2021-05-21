@@ -4,8 +4,8 @@
 
  #include    <cstdint>
  
-#ifndef  write_to_HLcontrol_task_H
-#define  write_to_HLcontrol_task_H
+#ifndef  _WRITE_TO_HLCONTROL_TASK_H_
+#define  _WRITE_TO_HLCONTROL_TASK_H_
 
 //***************************************************************************
 // Function templates

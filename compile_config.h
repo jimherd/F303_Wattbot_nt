@@ -1,7 +1,7 @@
 #include "mbed.h"
 
-#ifndef  COMPILE_CONFIG_H
-#define  COMPILE_CONFIG_H
+#ifndef  _COMPILE_CONFIG_H_
+#define  _COMPILE_CONFIG_H_
 
 //////////////////////////////////////////////////////////////////////////
 // Compile time configuration parameters

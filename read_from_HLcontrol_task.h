@@ -4,8 +4,8 @@
 
  #include    <cstdint>
  
-#ifndef  read_from_HLcontrol_task_H
-#define  read_from_HLcontrol_task_H
+#ifndef  _READ_FROM_HLCONTROL_TASK_H_
+#define  _READ_FROM_HLCONTROL_TASK_H_
 
 //***************************************************************************
 // Function templates

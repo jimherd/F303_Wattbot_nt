@@ -4,8 +4,8 @@
 
 #include    <cstdint>
 
-#ifndef  ROM_data_H
-#define  ROM_data_H
+#ifndef  _ROM_DATA_H_
+#define  _ROM_DATA_H_
 
 //***************************************************************************
 // ROM table to allow fast categorisation of charcaters in a command from 

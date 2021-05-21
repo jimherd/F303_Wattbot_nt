@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  *
  */
-#ifndef __TOKENIZER_H__
-#define __TOKENIZER_H__
+#ifndef _TOKENIZER_H_
+#define _TOKENIZER_H_
 
 enum {
   TOKENIZER_ERROR,

@@ -4,8 +4,8 @@
 
  #include    <cstdint>
  
-#ifndef  FPGA_IO_task_H
-#define  FPGA_IO_task_H
+#ifndef  _FPGA_IO_TASK_H_
+#define  _FPGA_IO_TASK_H_
 
 //***************************************************************************
 // Function templates

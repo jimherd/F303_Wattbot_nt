@@ -8,8 +8,8 @@
 #include "mbed.h"
 #include "compile_config.h"
 
-#ifndef  FPGA_bus_H
-#define  FPGA_bus_H
+#ifndef  _FPGA_BUS_H_
+#define  _FPGA_BUS_H_
  
 //////////////////////////////////////////////////////////////////////////
 // MACROS

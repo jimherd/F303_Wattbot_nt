@@ -4,8 +4,8 @@
 //***************************************************************************
 //
 
-#ifndef     GLOBALS_H
-#define     GLOBALS_H
+#ifndef     _GLOBALS_H_
+#define     _GLOBALS_H_
 
 //***************************************************************************
 // Necessary include files
@@ -67,7 +67,7 @@ typedef struct {
 
 
 //***************************************************************************
-// Set of commands that can be sent fro HLcontrol to uP
+// Set of commands that can be sent from HLcontrol to uP
 
 typedef enum {
     PING = 1,
@@ -87,20 +87,14 @@ typedef enum {
 #define SET_PROBE_1     probe_1_pin=1
 #define CLR_PROBE_1     probe_1_pin=0
 
-
-
-//***************************************************************************
-// Global Macros
-
 #define     FOREVER     for(;;)
 #define     HANG        for(;;)
-
 
 //***************************************************************************
 // Extern references to hardware interfaces
 
-extern FPGA_bus  bus;
-extern DigitalOut  led1;
+extern FPGA_bus       bus;
+extern DigitalOut     led1;
 extern BufferedSerial HLcontrol;
 
 //***************************************************************************

@@ -4,8 +4,8 @@
 
  #include    <cstdint>
  
-#ifndef  SYS_ROUTINES_H
-#define  SYS_ROUTINES_H
+#ifndef  _SYS_ROUTINES_H_
+#define  _SYS_ROUTINES_H_
 
 //***************************************************************************
 // Function templates
