@@ -78,11 +78,15 @@ Mail<LLcontrol_to_FPGAcontrol_packet_t,8> FPGA_cmd_queue;
 
 // Queue 2 : replies to high level controller
 //
-Mail<reply_packet_t, 8> HLcontrol_reply_queue;  // holds replies being sent to HLcontrol
+Mail<reply_packet_t, 8> HLcontrol_reply_queue; 
 
 // Queue 3 : commands to sequencer task
 //
 Mail<sequence_command_packet_t, 4> sequence_command_queue;
+
+// Queue 4 : FPGA replies from sequencer commands
+//
+Mail<reply_packet_t, 8> sequencer_reply_queue; 
 
 //***************************************************************************
 // ** init   initialise hardware and system

@@ -103,6 +103,7 @@ extern BufferedSerial HLcontrol;
 extern  Mail<LLcontrol_to_FPGAcontrol_packet_t,8> FPGA_cmd_queue;
 extern  Mail<reply_packet_t, 8> HLcontrol_reply_queue;  // holds replies being sent to HLcontrol
 extern  Mail<sequence_command_packet_t, 4> sequence_command_queue;
+extern  Mail<reply_packet_t, 8> sequencer_reply_queue; 
 
 
 //extern  Mail<reply_t,8> HLcontrol_reply_queue;  // holds replies being sent to HLcontrol
