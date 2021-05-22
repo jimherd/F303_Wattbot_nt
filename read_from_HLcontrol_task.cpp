@@ -270,6 +270,18 @@ int32_t execute_command(void) {
             FPGA_cmd_queue.put(FPGA_command);
             break;
         }  // end case 'S'   
+
+        case 'u' : {  // implement ubasic sequence command
+            sequence_command_packet_t *sequence_command = sequence_command_queue.try_alloc_for(Kernel::wait_for_u32_forever);
+            
+            sequence_command->port            = int_parameters[1];
+            sequence_command->sequence_number = int_parameters[1];
+            for (int i=0 ; i < NOS_SEQUENCE_PARAMETERS ; i++) {
+                sequence_command->parameters[i] = int_parameters[i];
+            }
+            sequence_command_queue.put(sequence_command);
+            break;
+        }
     }  // end of main switch
     return NO_ERROR;
 }
